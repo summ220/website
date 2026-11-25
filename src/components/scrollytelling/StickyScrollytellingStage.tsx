@@ -123,7 +123,7 @@ export const StickyScrollytellingStage: React.FC = () => {
       className="relative z-10 h-[400vh]"
     >
       {/* 吸顶全屏演示舞台（保持柔和浅色居家背景包裹） */}
-      <div className="sticky top-0 flex h-screen w-full flex-col justify-between overflow-hidden px-4 pt-20 pb-5 sm:px-6 sm:pt-24 sm:pb-7">
+      <div className="sticky top-0 flex min-h-screen w-full flex-col justify-between overflow-x-hidden px-4 pt-16 pb-4 sm:h-screen sm:overflow-hidden sm:px-6 sm:pt-24 sm:pb-7">
         {/* 随场景微调的柔和外部氛围光 */}
         <motion.div
           animate={{
@@ -190,11 +190,11 @@ export const StickyScrollytellingStage: React.FC = () => {
                     <span className="text-stone-700">{currentScene.badge}</span>
                   </div>
 
-                  <h2 className="text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl lg:text-[2.05rem] lg:leading-[1.2]">
+                  <h2 className="text-xl font-bold tracking-tight text-stone-900 sm:text-3xl lg:text-[2.05rem] lg:leading-[1.2]">
                     {currentScene.title}
                   </h2>
 
-                  <p className="text-sm leading-relaxed text-stone-600 sm:text-base">
+                  <p className="text-xs leading-relaxed text-stone-600 sm:text-base">
                     {currentScene.description}
                   </p>
 
@@ -337,8 +337,8 @@ export const StickyScrollytellingStage: React.FC = () => {
         </div>
 
         {/* 底部：消费级柔和场景切换胶囊 Dock */}
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-center gap-2">
-          <div className="inline-flex items-center gap-1 rounded-2xl border border-stone-200/90 bg-white/95 p-1.5 shadow-[0_10px_30px_rgba(28,25,23,0.08)] backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-center gap-2">
+          <div className="inline-flex items-center gap-1 rounded-2xl border border-stone-200/90 bg-white/95 p-1 shadow-[0_10px_30px_rgba(28,25,23,0.08)] backdrop-blur-xl sm:p-1.5">
             {SCENES.map((sceneItem, idx) => {
               const isActive = activeIdx === idx;
               return (
@@ -346,7 +346,7 @@ export const StickyScrollytellingStage: React.FC = () => {
                   key={sceneItem.id}
                   type="button"
                   onClick={() => handleSelectScene(idx)}
-                  className={`relative inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors sm:px-4 ${
+                  className={`relative inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-[11px] font-semibold transition-colors sm:gap-1.5 sm:px-4 sm:py-2 sm:text-xs ${
                     isActive
                       ? 'text-white'
                       : 'text-stone-600 hover:text-stone-900'
@@ -373,9 +373,9 @@ export const StickyScrollytellingStage: React.FC = () => {
               type="button"
               onClick={handleResetToScroll}
               title="恢复跟随页面滚动自动切换场景"
-              className="hidden items-center gap-1 rounded-xl border border-stone-200 bg-white/90 px-3 py-2 text-xs font-medium text-stone-600 shadow-sm backdrop-blur-xl transition hover:text-stone-900 sm:inline-flex"
+              className="inline-flex items-center gap-1 rounded-xl border border-stone-200 bg-white/90 px-3 py-1.5 text-[11px] font-medium text-stone-600 shadow-sm backdrop-blur-xl transition hover:text-stone-900 sm:py-2 sm:text-xs"
             >
-              <RotateCcw className="h-3.5 w-3.5" />
+              <RotateCcw className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               <span>跟随滚动</span>
             </button>
           )}

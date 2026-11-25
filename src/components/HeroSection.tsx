@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
@@ -104,11 +104,41 @@ const rightNodes: NodeItem[] = [
   },
 ];
 
+const AUTO_DEMO_ORDER = ['windows', 'mac', 'homepod', 'xiaomi', 'ios', 'huawei'];
+
 export const HeroSection: React.FC = () => {
   const [activeNode, setActiveNode] = useState<string | null>('windows');
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
 
   const allNodes = [...leftNodes, ...rightNodes];
   const activeNodeObj = allNodes.find((n) => n.id === activeNode) || null;
+
+  useEffect(() => {
+    if (!autoPlay || isHovered) return;
+    const timer = window.setInterval(() => {
+      setActiveNode((prev) => {
+        const idx = prev ? AUTO_DEMO_ORDER.indexOf(prev) : -1;
+        return AUTO_DEMO_ORDER[(idx + 1) % AUTO_DEMO_ORDER.length];
+      });
+    }, 3800);
+    return () => window.clearInterval(timer);
+  }, [autoPlay, isHovered]);
+
+  const handleSelectNode = (id: string) => {
+    setAutoPlay(false);
+    setActiveNode((prev) => (prev === id ? null : id));
+  };
+
+  const handleToggleCenter = () => {
+    if (autoPlay || activeNode !== null) {
+      setAutoPlay(false);
+      setActiveNode(null);
+    } else {
+      setAutoPlay(true);
+      setActiveNode('windows');
+    }
+  };
 
   return (
     <section className="relative z-10 overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24">
@@ -196,11 +226,13 @@ export const HeroSection: React.FC = () => {
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.65, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             className="lg:col-span-6"
           >
             <SpotlightCard borderBeam className="bg-white/95 p-4 sm:p-6">
               {/* 顶部友好导览栏 */}
-              <div className="mb-4 flex items-center justify-between border-b border-stone-100 pb-3">
+              <div className="mb-4 flex items-center justify-between gap-2 border-b border-stone-100 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
                     <Sparkles className="h-3.5 w-3.5" />
@@ -209,9 +241,18 @@ export const HeroSection: React.FC = () => {
                     跨品牌互联演示
                   </span>
                 </div>
-                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-800 ring-1 ring-amber-200/80">
-                  点一点任意设备试试
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setAutoPlay((prev) => !prev)}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-800 ring-1 ring-amber-200/80 transition hover:bg-amber-100"
+                >
+                  {autoPlay && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  )}
+                  <span>
+                    {autoPlay ? '自动轮播中 · 点设备可固定' : '点一点设备 · 开启自动轮播'}
+                  </span>
+                </button>
               </div>
 
               {/* 互动连接画布 */}
@@ -332,22 +373,22 @@ export const HeroSection: React.FC = () => {
                 </svg>
 
                 {/* 左侧：平时用的手机和电脑 */}
-                <div className="absolute inset-y-0 left-2 flex w-[34%] flex-col justify-between py-3.5 sm:w-[30%]">
+                <div className="absolute inset-y-0 left-1.5 flex w-[31%] flex-col justify-between py-3.5 sm:left-2 sm:w-[30%]">
                   {leftNodes.map((node) => {
                     const isActive = activeNode === node.id;
                     return (
                       <button
                         key={node.id}
                         type="button"
-                        onClick={() => setActiveNode(isActive ? null : node.id)}
-                        className={`group flex items-center gap-2 rounded-2xl border px-2.5 py-2 text-left transition-all sm:gap-2.5 sm:px-3 ${
+                        onClick={() => handleSelectNode(node.id)}
+                        className={`group flex items-center gap-1.5 rounded-xl border px-2 py-2 text-left transition-all sm:gap-2.5 sm:rounded-2xl sm:px-3 ${
                           isActive
                             ? 'border-indigo-400 bg-white shadow-[0_8px_20px_rgba(79,70,229,0.15)] ring-1 ring-indigo-200'
                             : 'border-stone-200/90 bg-white/85 hover:border-indigo-200 hover:bg-white'
                         }`}
                       >
                         <div
-                          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-xl ${
+                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg sm:h-7 sm:w-7 sm:rounded-xl ${
                             isActive
                               ? 'bg-indigo-600 text-white'
                               : 'bg-stone-100 text-stone-600 group-hover:bg-indigo-50 group-hover:text-indigo-600'
@@ -356,7 +397,7 @@ export const HeroSection: React.FC = () => {
                           {node.icon}
                         </div>
                         <div className="min-w-0">
-                          <div className="truncate text-xs font-semibold text-stone-800">
+                          <div className="truncate text-[11px] font-semibold text-stone-800 sm:text-xs">
                             {node.label}
                           </div>
                           <div className="hidden truncate text-[10px] text-stone-500 sm:block">
@@ -372,41 +413,41 @@ export const HeroSection: React.FC = () => {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                   <motion.button
                     type="button"
-                    onClick={() => setActiveNode(null)}
+                    onClick={handleToggleCenter}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.96 }}
-                    title="点击查看全部设备同时连接"
-                    className="relative flex h-24 w-24 flex-col items-center justify-center rounded-3xl border border-indigo-200 bg-white shadow-[0_14px_35px_rgba(79,70,229,0.18)] sm:h-28 sm:w-28"
+                    title="点击切换全部连接或自动演示"
+                    className="relative flex h-[68px] w-[68px] flex-col items-center justify-center rounded-2xl border border-indigo-200 bg-white shadow-[0_14px_35px_rgba(79,70,229,0.18)] sm:h-28 sm:w-28 sm:rounded-3xl"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/30">
-                      <Home className="h-5 w-5" />
+                    <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/30 sm:h-10 sm:w-10 sm:rounded-2xl">
+                      <Home className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
                     </div>
-                    <span className="mt-1.5 text-xs font-bold text-stone-900">
+                    <span className="mt-1 text-[10px] font-bold text-stone-900 sm:mt-1.5 sm:text-xs">
                       AuraHub
                     </span>
-                    <span className="text-[10px] font-medium text-indigo-600">
+                    <span className="hidden text-[10px] font-medium text-indigo-600 sm:block">
                       全屋翻译官
                     </span>
                   </motion.button>
                 </div>
 
                 {/* 右侧：家里各品牌的音箱和家电 */}
-                <div className="absolute inset-y-0 right-2 flex w-[34%] flex-col justify-between py-3.5 sm:w-[30%]">
+                <div className="absolute inset-y-0 right-1.5 flex w-[31%] flex-col justify-between py-3.5 sm:right-2 sm:w-[30%]">
                   {rightNodes.map((node) => {
                     const isActive = activeNode === node.id;
                     return (
                       <button
                         key={node.id}
                         type="button"
-                        onClick={() => setActiveNode(isActive ? null : node.id)}
-                        className={`group flex items-center gap-2 rounded-2xl border px-2.5 py-2 text-left transition-all sm:gap-2.5 sm:px-3 ${
+                        onClick={() => handleSelectNode(node.id)}
+                        className={`group flex items-center gap-1.5 rounded-xl border px-2 py-2 text-left transition-all sm:gap-2.5 sm:rounded-2xl sm:px-3 ${
                           isActive
                             ? 'border-sky-400 bg-white shadow-[0_8px_20px_rgba(2,132,199,0.14)] ring-1 ring-sky-200'
                             : 'border-stone-200/90 bg-white/85 hover:border-sky-200 hover:bg-white'
                         }`}
                       >
                         <div
-                          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-xl ${
+                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg sm:h-7 sm:w-7 sm:rounded-xl ${
                             isActive
                               ? 'bg-sky-600 text-white'
                               : 'bg-stone-100 text-stone-600 group-hover:bg-sky-50 group-hover:text-sky-600'
@@ -415,7 +456,7 @@ export const HeroSection: React.FC = () => {
                           {node.icon}
                         </div>
                         <div className="min-w-0">
-                          <div className="truncate text-xs font-semibold text-stone-800">
+                          <div className="truncate text-[11px] font-semibold text-stone-800 sm:text-xs">
                             {node.label}
                           </div>
                           <div className="hidden truncate text-[10px] text-stone-500 sm:block">

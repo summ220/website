@@ -8,7 +8,7 @@ interface RoomBaseLayerProps {
 
 /**
  * 温馨居家 2.5D 书房实景底座：
- * 随早晨、白天开会、傍晚放松、深夜晚安自动过渡墙面、原木家具与窗外光线色调
+ * 将底色与固定透明明暗层分离，实现清晨、白天、傍晚、深夜全屋色调 0.7s 平滑渐变过渡
  */
 export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
   if (scene.layers?.baseImageUrl) {
@@ -26,42 +26,44 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
   const isSleep = scene.id === 'sleep';
   const isMeeting = scene.monitorMode === 'meeting';
 
-  // 根据时段平滑切换居家色调（清晨/白天暖白，傍晚暖暮，深夜静谧）
-  const wallTop = isDay ? '#F3EFE7' : isVoice ? '#3B3646' : '#181A24';
-  const wallBottom = isDay ? '#E4DDD1' : isVoice ? '#282431' : '#101219';
+  // 平滑日夜基色表（通过 CSS duration-700 过渡所有 fill/stroke/opacity）
+  const wallBase = isDay ? '#EDE8DF' : isVoice ? '#322D3C' : '#141620';
   const slatFillA = isDay ? '#D6B894' : isVoice ? '#59463A' : '#262121';
   const slatFillB = isDay ? '#CCA982' : isVoice ? '#4E3D32' : '#201C1C';
-  const deskTop = isDay ? '#E7D5BE' : isVoice ? '#5E4B3E' : '#252124';
-  const deskBottom = isDay ? '#D4BD9E' : isVoice ? '#46372E' : '#181619';
+  const deskBase = isDay ? '#DFCBB2' : isVoice ? '#544237' : '#201D21';
   const deskEdge = isDay ? '#C5AB89' : isVoice ? '#3D3028' : '#1E1B1F';
-  const acTop = isDay ? '#FFFFFF' : isVoice ? '#D6D3D1' : '#44403C';
-  const acBottom = isDay ? '#E7E5E4' : isVoice ? '#A8A29E' : '#292524';
+  const acBase = isDay ? '#F8F7F5' : isVoice ? '#C2BDB7' : '#3A3734';
+  const homepodBase = isDay ? '#EAE8E4' : '#2E2E35';
   const doorBg = isDay ? '#DED7CA' : isVoice ? '#2A2633' : '#111219';
 
   return (
     <div className="pointer-events-none absolute inset-0 select-none overflow-hidden">
       <svg
         viewBox="0 0 1200 720"
-        className="h-full w-full object-cover"
+        className="h-full w-full object-cover [&_circle]:transition-all [&_circle]:duration-700 [&_ellipse]:transition-all [&_ellipse]:duration-700 [&_g]:transition-opacity [&_g]:duration-700 [&_line]:transition-all [&_line]:duration-700 [&_path]:transition-all [&_path]:duration-700 [&_polygon]:transition-all [&_polygon]:duration-700 [&_rect]:transition-all [&_rect]:duration-700"
         preserveAspectRatio="xMidYMid slice"
       >
         <defs>
-          {/* 墙面柔和渐变 */}
-          <linearGradient id="homeWallGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={wallTop} />
-            <stop offset="100%" stopColor={wallBottom} />
+          {/* 固定明暗深度遮罩（与底层纯色分离以便 CSS 渐变） */}
+          <linearGradient id="wallDepthShade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.16)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.14)" />
           </linearGradient>
 
-          {/* 橡木桌面渐变 */}
-          <linearGradient id="woodDeskGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={deskTop} />
-            <stop offset="100%" stopColor={deskBottom} />
+          <linearGradient id="deskDepthShade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.12)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.16)" />
           </linearGradient>
 
-          {/* 空调机身渐变 */}
-          <linearGradient id="homeAcGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={acTop} />
-            <stop offset="100%" stopColor={acBottom} />
+          <linearGradient id="acDepthShade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.28)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.16)" />
+          </linearGradient>
+
+          <linearGradient id="homepodShade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.22)" />
+            <stop offset="45%" stopColor="rgba(255,255,255,0)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.25)" />
           </linearGradient>
 
           {/* HomePod 编织质感 */}
@@ -78,12 +80,6 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
               strokeWidth="0.7"
             />
           </pattern>
-
-          <linearGradient id="homepodBodyGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor={isDay ? '#F5F5F4' : '#3F3F46'} />
-            <stop offset="45%" stopColor={isDay ? '#E7E5E4' : '#27272A'} />
-            <stop offset="100%" stopColor={isDay ? '#D6D3D1' : '#18181B'} />
-          </linearGradient>
 
           {/* 显示器铝制支架 */}
           <linearGradient id="standGrad" x1="0" y1="0" x2="1" y2="0">
@@ -111,7 +107,8 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
         </defs>
 
         {/* 1. 房间背景墙 */}
-        <rect x="0" y="0" width="1200" height="720" fill="url(#homeWallGrad)" />
+        <rect x="0" y="0" width="1200" height="720" fill={wallBase} />
+        <rect x="0" y="0" width="1200" height="720" fill="url(#wallDepthShade)" />
 
         {/* 左侧温馨木格栅背景墙 */}
         <g opacity={isSleep ? 0.55 : 0.92}>
@@ -128,15 +125,13 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
           ))}
         </g>
 
-        {/* 左上角窗户百叶暖阳投影（白天或清晨可见） */}
-        {isDay && (
-          <g opacity="0.28">
-            <polygon points="240,0 430,0 590,460 320,460" fill="#FFFBEB" />
-            <line x1="250" y1="90" x2="465" y2="90" stroke="#E6DDD0" strokeWidth="5" />
-            <line x1="275" y1="180" x2="495" y2="180" stroke="#E6DDD0" strokeWidth="5" />
-            <line x1="300" y1="270" x2="525" y2="270" stroke="#E6DDD0" strokeWidth="5" />
-          </g>
-        )}
+        {/* 左上角窗户百叶暖阳投影（平滑淡入淡出） */}
+        <g opacity={isDay ? 0.28 : 0}>
+          <polygon points="240,0 430,0 590,460 320,460" fill="#FFFBEB" />
+          <line x1="250" y1="90" x2="465" y2="90" stroke="#E6DDD0" strokeWidth="5" />
+          <line x1="275" y1="180" x2="495" y2="180" stroke="#E6DDD0" strokeWidth="5" />
+          <line x1="300" y1="270" x2="525" y2="270" stroke="#E6DDD0" strokeWidth="5" />
+        </g>
 
         {/* 墙面踢脚线与空间分隔 */}
         <line
@@ -167,7 +162,7 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
           fill={isDay ? '#78716C' : '#52525B'}
         />
 
-        {/* 装饰壁画框（增强居家感） */}
+        {/* 装饰壁画框 */}
         <g transform="translate(260, 95)" opacity={isSleep ? 0.4 : 0.95}>
           <rect
             x="0"
@@ -199,10 +194,11 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
             width="268"
             height="76"
             rx="14"
-            fill="url(#homeAcGrad)"
+            fill={acBase}
             stroke={isDay ? 'rgba(168,162,158,0.4)' : 'rgba(255,255,255,0.14)'}
             strokeWidth="1.2"
           />
+          <rect x="0" y="0" width="268" height="76" rx="14" fill="url(#acDepthShade)" />
           <line
             x1="16"
             y1="48"
@@ -231,7 +227,6 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
             fill={isDay ? '#C9B9A6' : isVoice ? '#261F1C' : '#0C0B0E'}
             opacity="0.35"
           />
-          {/* 桌腿 */}
           <rect
             x="150"
             y="525"
@@ -249,11 +244,14 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
           {/* 桌面主体 */}
           <polygon
             points="92,465 1068,465 1114,526 52,526"
-            fill="url(#woodDeskGrad)"
+            fill={deskBase}
             stroke={isDay ? 'rgba(168,140,108,0.45)' : 'rgba(255,255,255,0.1)'}
             strokeWidth="1"
           />
-          {/* 桌面屏前倒影 */}
+          <polygon
+            points="92,465 1068,465 1114,526 52,526"
+            fill="url(#deskDepthShade)"
+          />
           <polygon
             points="395,466 805,466 835,518 365,518"
             fill="url(#deskReflectGrad)"
@@ -278,7 +276,6 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
             stroke={isDay ? 'rgba(120,113,108,0.2)' : 'rgba(255,255,255,0.1)'}
             strokeWidth="0.8"
           />
-          {/* 桌沿厚度 */}
           <rect
             x="52"
             y="526"
@@ -300,7 +297,6 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
           />
           <polygon points="178,262 252,262 264,272 166,272" fill="#D4D4D8" />
           <rect x="206" y="198" width="18" height="66" fill="url(#standGrad)" />
-          {/* 银灰外框 */}
           <rect
             x="0"
             y="0"
@@ -312,7 +308,6 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
             strokeWidth="2.2"
           />
           <rect x="8" y="8" width="414" height="204" rx="6" fill="#09090B" />
-          {/* 摄像头与开启绿灯 */}
           <circle cx="215" cy="4.5" r="1.8" fill="#44403C" />
           {isMeeting && (
             <circle cx="223" cy="4.5" r="2.2" fill="#22C55E" />
@@ -397,10 +392,11 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
             width="80"
             height="102"
             rx="28"
-            fill="url(#homepodBodyGrad)"
+            fill={homepodBase}
             stroke={isDay ? 'rgba(168,162,158,0.45)' : 'rgba(255,255,255,0.16)'}
             strokeWidth="1"
           />
+          <rect x="4" y="8" width="80" height="102" rx="28" fill="url(#homepodShade)" />
           <rect x="4" y="8" width="80" height="102" rx="28" fill="url(#homepodMesh)" />
           <ellipse
             cx="44"
@@ -413,7 +409,7 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
           />
         </g>
 
-        {/* 7. 桌面小盆栽装饰（增强居家生活感） */}
+        {/* 7. 桌面小盆栽装饰 */}
         <g transform="translate(960, 425)" opacity={isSleep ? 0.5 : 1}>
           <path d="M 8 24 L 38 24 L 34 46 L 12 46 Z" fill={isDay ? '#E7E5E4' : '#3F3F46'} />
           <ellipse cx="18" cy="14" rx="9" ry="14" transform="rotate(-18 18 14)" fill="#4D7C0F" opacity="0.85" />
@@ -440,7 +436,6 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
             stroke={isDay ? '#D6D3D1' : 'rgba(255,255,255,0.2)'}
             strokeWidth="1.2"
           />
-          {/* 顶部温和指示窗 */}
           <rect
             x="16"
             y="12"

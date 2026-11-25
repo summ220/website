@@ -6,6 +6,7 @@ import { StickyScrollytellingStage } from './components/scrollytelling/StickyScr
 import { BentoGrid } from './components/BentoGrid';
 import { DeploymentSection } from './components/DeploymentSection';
 import { RoadmapSection } from './components/RoadmapSection';
+import { FAQSection } from './components/FAQSection';
 import { Footer } from './components/Footer';
 
 export function App() {
@@ -20,6 +21,7 @@ export function App() {
         <BentoGrid />
         <DeploymentSection />
         <RoadmapSection />
+        <FAQSection />
       </main>
       <Footer />
     </div>

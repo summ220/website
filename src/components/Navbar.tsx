@@ -9,6 +9,7 @@ const navLinks = [
   { id: 'features', label: '好用功能', href: '#features' },
   { id: 'deploy', label: '获取与预约', href: '#deploy' },
   { id: 'roadmap', label: '产品计划', href: '#roadmap' },
+  { id: 'faq', label: '常见疑问', href: '#faq' },
 ];
 
 export const Navbar: React.FC = () => {

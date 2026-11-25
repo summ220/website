@@ -200,19 +200,22 @@ export const DeviceEffectsLayer: React.FC<DeviceEffectsLayerProps> = ({
         )}
       </div>
 
-      {/* 5. 高对比度可点击设备控制胶囊（白天夜晚都清晰好点） */}
+      {/* 5. 高对比度可点击设备控制胶囊（白天夜晚及手机端都清晰好点） */}
       {/* 台灯热点 */}
       <button
         type="button"
         onClick={onToggleLamp}
         title="点一下试试开关台灯"
-        className="pointer-events-auto group absolute left-[22%] top-[36%] flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full border border-stone-200/90 bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-stone-800 shadow-md backdrop-blur-md transition hover:scale-105 hover:border-amber-400"
+        className="pointer-events-auto group absolute left-[22%] top-[36%] flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-stone-200/90 bg-white/95 px-2 py-0.5 text-[10px] font-semibold text-stone-800 shadow-md backdrop-blur-md transition hover:scale-105 hover:border-amber-400 sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-[11px]"
       >
         <Lightbulb
-          className={`h-3.5 w-3.5 ${
+          className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${
             scene.lampBrightness > 0.05 ? 'text-amber-500 fill-amber-400/30' : 'text-stone-400'
           }`}
         />
+        <span className="sm:hidden">
+          {scene.lampBrightness > 0.05 ? '开灯' : '关灯'}
+        </span>
         <span className="hidden sm:inline">
           {scene.lampBrightness > 0.05
             ? `台灯 ${Math.round(scene.lampBrightness * 100)}%`
@@ -225,9 +228,12 @@ export const DeviceEffectsLayer: React.FC<DeviceEffectsLayerProps> = ({
         type="button"
         onClick={onToggleAc}
         title="点一下试试开关空调"
-        className="pointer-events-auto group absolute left-[72%] top-[9%] flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full border border-stone-200/90 bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-stone-800 shadow-md backdrop-blur-md transition hover:scale-105 hover:border-sky-400"
+        className="pointer-events-auto group absolute left-[72%] top-[9%] flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-stone-200/90 bg-white/95 px-2 py-0.5 text-[10px] font-semibold text-stone-800 shadow-md backdrop-blur-md transition hover:scale-105 hover:border-sky-400 sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-[11px]"
       >
-        <Wind className={`h-3.5 w-3.5 ${scene.acOn ? 'text-sky-600' : 'text-stone-400'}`} />
+        <Wind className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${scene.acOn ? 'text-sky-600' : 'text-stone-400'}`} />
+        <span className="sm:hidden">
+          {scene.acOn ? `${scene.acTemp}°` : '空调'}
+        </span>
         <span className="hidden sm:inline">
           {scene.acOn ? `空调 ${scene.acTemp}°C` : '空调 关闭'}
         </span>
@@ -238,10 +244,10 @@ export const DeviceEffectsLayer: React.FC<DeviceEffectsLayerProps> = ({
         type="button"
         onClick={onToggleHomePod}
         title="点一下试试切换音箱状态"
-        className="pointer-events-auto group absolute left-[76%] top-[72%] flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full border border-stone-200/90 bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-stone-800 shadow-md backdrop-blur-md transition hover:scale-105 hover:border-indigo-400"
+        className="pointer-events-auto group absolute left-[76%] top-[72%] flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-stone-200/90 bg-white/95 px-2 py-0.5 text-[10px] font-semibold text-stone-800 shadow-md backdrop-blur-md transition hover:scale-105 hover:border-indigo-400 sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-[11px]"
       >
         <Speaker
-          className={`h-3.5 w-3.5 ${
+          className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${
             scene.homePodMode === 'playing'
               ? 'text-indigo-600'
               : scene.homePodMode === 'muted'
@@ -249,6 +255,13 @@ export const DeviceEffectsLayer: React.FC<DeviceEffectsLayerProps> = ({
               : 'text-stone-400'
           }`}
         />
+        <span className="sm:hidden">
+          {scene.homePodMode === 'playing'
+            ? '放歌'
+            : scene.homePodMode === 'muted'
+            ? '静音'
+            : '音箱'}
+        </span>
         <span className="hidden sm:inline">
           {scene.homePodMode === 'playing'
             ? 'HomePod 播放中'
