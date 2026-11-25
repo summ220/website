@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #060609;
+    color: #f4f4f5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    overflow-x: clip;
+  }
+}
+
+/* 自定义极简暗黑滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #060609;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(129, 140, 248, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(129, 140, 248, 0.45);
+}
+
+/* 顶部多层冷极光径向光晕 */
+.aurora-radial {
+  background:
+    radial-gradient(ellipse 65% 48% at 50% -5%, rgba(129, 140, 248, 0.28), transparent 70%),
+    radial-gradient(ellipse 45% 40% at 72% 18%, rgba(56, 189, 248, 0.14), transparent 65%);
+}
+
+/* 精密硬件点阵底纹 */
+.dot-matrix {
+  background-image: radial-gradient(rgba(165, 180, 252, 0.18) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+/* 工程斜纹暗色质感 */
+.tech-hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.025) 0px,
+    rgba(255, 255, 255, 0.025) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+}
+
+/* 监视器细腻扫描线质感 */
+.scanline-overlay {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 50%
+  );
+  background-size: 100% 4px;
+}
+
+/* 3D 透视地板科技网格 */
+.perspective-grid {
+  background-image:
+    linear-gradient(to right, rgba(129, 140, 248, 0.14) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(129, 140, 248, 0.14) 1px, transparent 1px);
+  background-size: 56px 56px;
+  transform: perspective(640px) rotateX(62deg) scale(1.8);
+  transform-origin: center top;
+}
+
+/* 胶片级细腻暗黑噪点材质（内联 SVG） */
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* 按钮流光扫边 */
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-20deg);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer-sweep 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* 无尽协议总线跑马灯 */
+@keyframes marquee-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee-left {
+  animation: marquee-left 28s linear infinite;
+}
+
+.animate-marquee-right {
+  animation: marquee-right 32s linear infinite;
+}
