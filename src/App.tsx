@@ -10,7 +10,7 @@ import { Footer } from './components/Footer';
 
 export function App() {
   return (
-    <div className="relative min-h-screen bg-[#070709] text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="relative min-h-screen bg-[#FAF9F6] text-stone-900 selection:bg-indigo-500/15 selection:text-indigo-900">
       <AmbientBackdrop />
       <Navbar />
       <main className="relative z-10">

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Github, Terminal, Menu, X } from 'lucide-react';
+import { Github, Sparkles, Menu, X, Home } from 'lucide-react';
 
-// 严格与页面自上而下的 DOM 模块顺序保持 100% 一致
+// 严格与页面自上而下的 DOM 模块顺序保持一致
 const navLinks = [
-  { id: 'sandbox', label: '在线体验', href: '#sandbox' },
-  { id: 'features', label: '核心特性', href: '#features' },
-  { id: 'deploy', label: '开源部署', href: '#deploy' },
-  { id: 'roadmap', label: '硬件路线', href: '#roadmap' },
+  { id: 'pain-points', label: '解决什么问题', href: '#pain-points' },
+  { id: 'sandbox', label: '一天怎么用', href: '#sandbox' },
+  { id: 'features', label: '好用功能', href: '#features' },
+  { id: 'deploy', label: '获取与预约', href: '#deploy' },
+  { id: 'roadmap', label: '产品计划', href: '#roadmap' },
 ];
 
 export const Navbar: React.FC = () => {
@@ -20,7 +21,6 @@ export const Navbar: React.FC = () => {
       const y = window.scrollY;
       setScrolled(y > 24);
 
-      // 计算当前视口激活的区块
       const probeY = y + window.innerHeight * 0.32;
       let current = '';
       for (const item of navLinks) {
@@ -51,12 +51,10 @@ export const Navbar: React.FC = () => {
     const el = document.getElementById(id);
     if (!el) return;
 
-    // #sandbox 为 sticky 舞台，定位到其顶部即可完美展示第 01 帧；其余区块预留顶部导航高度
     const targetTop =
-      id === 'sandbox' ? el.offsetTop : Math.max(0, el.offsetTop - 72);
+      id === 'sandbox' ? el.offsetTop : Math.max(0, el.offsetTop - 76);
     const distance = Math.abs(window.scrollY - targetTop);
 
-    // 跨越超过 1800px（如跨过 400vh Sticky 舞台）时直接精准落位，避免高速闪过多个 sticky 章节导致“乱跳”观感
     window.scrollTo({
       top: targetTop,
       behavior: distance > 1800 ? 'auto' : 'smooth',
@@ -64,15 +62,15 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 sm:px-6">
+    <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-3.5 sm:px-6">
       <motion.nav
         initial={{ y: -16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className={`flex w-full max-w-6xl items-center justify-between rounded-2xl border px-4 py-2.5 transition-all duration-300 sm:px-6 ${
+        className={`flex w-full max-w-6xl items-center justify-between rounded-2xl border px-4 py-2.5 transition-all duration-300 sm:px-5 ${
           scrolled
-            ? 'border-white/[0.12] bg-[#0B0B10]/85 shadow-[0_12px_40px_rgba(0,0,0,0.75)] backdrop-blur-2xl'
-            : 'border-white/[0.08] bg-[#0B0B10]/55 backdrop-blur-xl'
+            ? 'border-stone-200/90 bg-white/90 shadow-[0_10px_35px_rgba(28,25,23,0.08)] backdrop-blur-2xl'
+            : 'border-stone-200/70 bg-white/75 shadow-[0_4px_20px_rgba(28,25,23,0.04)] backdrop-blur-xl'
         }`}
       >
         {/* Logo */}
@@ -84,22 +82,21 @@ export const Navbar: React.FC = () => {
           }}
           className="group flex items-center gap-2.5"
         >
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.14] bg-gradient-to-b from-white/[0.1] to-transparent">
-            <div className="h-2.5 w-2.5 rounded-full bg-indigo-400 shadow-[0_0_12px_rgba(129,140,248,0.9)] transition-transform duration-300 group-hover:scale-110" />
-            <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-indigo-400/25" />
+          <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-500 text-white shadow-sm shadow-indigo-500/30 transition-transform duration-300 group-hover:scale-105">
+            <Home className="h-4 w-4" />
           </div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-sm font-semibold tracking-tight text-zinc-100">
+          <div className="flex items-baseline gap-2">
+            <span className="text-base font-bold tracking-tight text-stone-900">
               AuraHub
             </span>
-            <span className="hidden rounded bg-white/[0.07] px-1.5 py-0.5 font-mono text-[10px] text-indigo-300 sm:inline-block">
-              v0.9-alpha
+            <span className="hidden rounded-full bg-amber-100/90 px-2 py-0.5 text-[11px] font-medium text-amber-800 sm:inline-block">
+              开源版
             </span>
           </div>
         </a>
 
-        {/* Desktop Links（顺序与页面流完全对齐 + 实时高亮指示） */}
-        <div className="hidden items-center gap-1 md:flex">
+        {/* Desktop Links */}
+        <div className="hidden items-center gap-1 lg:flex">
           {navLinks.map((item) => {
             const isActive = activeId === item.id;
             return (
@@ -107,17 +104,17 @@ export const Navbar: React.FC = () => {
                 key={item.id}
                 href={item.href}
                 onClick={(e) => handleNavClick(e, item.id)}
-                className={`relative rounded-lg px-3.5 py-1.5 text-sm transition-colors ${
+                className={`relative rounded-xl px-3.5 py-1.5 text-sm transition-colors ${
                   isActive
-                    ? 'font-medium text-white'
-                    : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100'
+                    ? 'font-semibold text-indigo-700'
+                    : 'font-medium text-stone-600 hover:bg-stone-100/80 hover:text-stone-900'
                 }`}
               >
                 {isActive && (
                   <motion.span
                     layoutId="navActivePill"
                     transition={{ type: 'spring', stiffness: 360, damping: 30 }}
-                    className="absolute inset-0 -z-10 rounded-lg border border-indigo-400/30 bg-indigo-500/15 shadow-[0_0_16px_rgba(129,140,248,0.2)]"
+                    className="absolute inset-0 -z-10 rounded-xl bg-indigo-50 ring-1 ring-indigo-200/80"
                   />
                 )}
                 {item.label}
@@ -132,18 +129,19 @@ export const Navbar: React.FC = () => {
             href="https://github.com"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-300 transition-all hover:border-white/[0.2] hover:bg-white/[0.08] hover:text-white"
+            title="查看开源项目主页"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-600 transition hover:border-stone-300 hover:bg-stone-50 hover:text-stone-900"
           >
             <Github className="h-3.5 w-3.5" />
-            <span>GitHub</span>
+            <span>开源主页</span>
           </a>
           <a
             href="#deploy"
             onClick={(e) => handleNavClick(e, 'deploy')}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3.5 py-1.5 text-xs font-semibold text-zinc-950 shadow-[0_0_24px_rgba(255,255,255,0.16)] transition-all hover:bg-white"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-indigo-600/25 transition hover:bg-indigo-700"
           >
-            <Terminal className="h-3.5 w-3.5" />
-            <span>一键部署</span>
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>立即使用</span>
           </a>
         </div>
 
@@ -151,8 +149,8 @@ export const Navbar: React.FC = () => {
         <button
           type="button"
           onClick={() => setMobileOpen((prev) => !prev)}
-          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-zinc-300 md:hidden"
-          aria-label="Toggle Navigation"
+          className="flex h-8 w-8 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-700 md:hidden"
+          aria-label="打开导航菜单"
         >
           {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </button>
@@ -166,7 +164,7 @@ export const Navbar: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-x-4 top-20 z-40 rounded-2xl border border-white/[0.12] bg-[#0B0B10]/95 p-4 backdrop-blur-2xl md:hidden"
+            className="absolute inset-x-4 top-[72px] z-40 rounded-2xl border border-stone-200 bg-white/95 p-4 shadow-xl backdrop-blur-2xl md:hidden"
           >
             <div className="flex flex-col gap-1">
               {navLinks.map((item) => {
@@ -176,10 +174,10 @@ export const Navbar: React.FC = () => {
                     key={item.id}
                     href={item.href}
                     onClick={(e) => handleNavClick(e, item.id)}
-                    className={`rounded-lg px-3 py-2.5 text-sm transition ${
+                    className={`rounded-xl px-3.5 py-2.5 text-sm transition ${
                       isActive
-                        ? 'bg-indigo-500/15 font-medium text-indigo-200'
-                        : 'text-zinc-300 hover:bg-white/[0.05] hover:text-white'
+                        ? 'bg-indigo-50 font-semibold text-indigo-700'
+                        : 'font-medium text-stone-700 hover:bg-stone-100'
                     }`}
                   >
                     {item.label}
@@ -187,23 +185,23 @@ export const Navbar: React.FC = () => {
                 );
               })}
             </div>
-            <div className="mt-4 flex flex-col gap-2 border-t border-white/[0.08] pt-4">
+            <div className="mt-4 flex flex-col gap-2 border-t border-stone-100 pt-4">
               <a
                 href="https://github.com"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] py-2 text-xs font-medium text-zinc-200"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-stone-200 bg-stone-50 py-2.5 text-xs font-medium text-stone-700"
               >
                 <Github className="h-3.5 w-3.5" />
-                <span>GitHub 仓库</span>
+                <span>开源项目主页</span>
               </a>
               <a
                 href="#deploy"
                 onClick={(e) => handleNavClick(e, 'deploy')}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-100 py-2 text-xs font-semibold text-zinc-950"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 py-2.5 text-xs font-semibold text-white"
               >
-                <Terminal className="h-3.5 w-3.5" />
-                <span>一键部署</span>
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>立即使用 / 预约盒子</span>
               </a>
             </div>
           </motion.div>

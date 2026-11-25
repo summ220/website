@@ -1,158 +1,203 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Activity, Shield, Cpu, Layers } from 'lucide-react';
-import { ScrambleText } from './ScrambleText';
+import {
+  Smartphone,
+  Speaker,
+  WifiOff,
+  Check,
+  X,
+  Zap,
+  ShieldCheck,
+  Cpu,
+  Layers,
+} from 'lucide-react';
 
-const metrics = [
+const painComparisons = [
   {
-    value: '1.8 ms',
-    label: '局域网跨端路由延迟',
-    sub: 'WASAPI / AirPlay 2 直通',
-    icon: <Activity className="h-3.5 w-3.5 text-sky-300" />,
+    title: '再也不用满手机翻找 App',
+    icon: <Smartphone className="h-5 w-5 text-indigo-600" />,
+    before: '开灯要打开米家，调音箱要进苹果家庭，开关空调还得找半天遥控器。',
+    after: '手机桌面或电脑右上角点一下，或者说一句话，不同品牌一起听你的。',
   },
   {
-    value: '0 Byte',
-    label: '语音与状态上传云端',
-    sub: '本地量化 LLM · 断网可用',
-    icon: <Shield className="h-3.5 w-3.5 text-emerald-300" />,
+    title: '电脑和音箱不再“各过各的”',
+    icon: <Speaker className="h-5 w-5 text-sky-600" />,
+    before: 'Windows 电脑连不上 HomePod 放歌；开视频会议时音箱还在大声播报。',
+    after: 'Windows / 安卓无线投音到 HomePod；电脑一开会，全屋音箱自动静音。',
   },
   {
-    value: '4 OS',
-    label: '桌面与移动统一感知',
-    sub: 'macOS · Win · iOS · Android',
-    icon: <Layers className="h-3.5 w-3.5 text-indigo-300" />,
-  },
-  {
-    value: '¥150',
-    label: '开源 ARM64 参考硬件',
-    sub: 'USB-C 5V / 2.5W 静默运行',
-    icon: <Cpu className="h-3.5 w-3.5 text-zinc-300" />,
+    title: '不怕断网，对话不上传云端',
+    icon: <WifiOff className="h-5 w-5 text-emerald-600" />,
+    before: '很多智能设备一断宽带就彻底失灵，平时语音记录还要传到厂家服务器。',
+    after: '思考和指令都在自家小盒子里完成，断了网照样秒响应，家里对话绝不出门。',
   },
 ];
 
-const protocolsRow1 = [
-  'Matter 1.3',
-  'AirPlay 2 Bridge',
-  'Xiaomi MIoT',
-  'Huawei HiLink',
-  'Home Assistant',
-  'Thread Border Router',
-  'WASAPI Lossless',
-  'Apple HomeKit',
+const summaryStats = [
+  {
+    value: '秒级响应',
+    label: '局域网直连，点完就亮',
+    sub: '不用等云端服务器转一圈',
+    icon: <Zap className="h-4 w-4 text-amber-600" />,
+  },
+  {
+    value: '0 隐私上传',
+    label: '断网也能正常说话控制',
+    sub: '语音记录只留在家中本地',
+    icon: <ShieldCheck className="h-4 w-4 text-emerald-600" />,
+  },
+  {
+    value: '4 大系统',
+    label: '手机电脑全都能控制家里',
+    sub: 'Windows · Mac · iPhone · 安卓',
+    icon: <Layers className="h-4 w-4 text-indigo-600" />,
+  },
+  {
+    value: '约 ¥150',
+    label: '插电即用的可选小盒子',
+    sub: '软件版还支持免费装在电脑上',
+    icon: <Cpu className="h-4 w-4 text-sky-600" />,
+  },
 ];
 
-const protocolsRow2 = [
-  'Local LLM NPU',
-  'DLNA / UPnP',
-  'MQTT Broker',
-  'Zigbee2MQTT',
-  'mDNS Discovery',
-  'WebRTC Audio',
-  'Alpine Linux',
-  'Docker Compose',
+const brandsRow1 = [
+  'Apple HomePod',
+  '小米 / 米家全系',
+  '华为 Sound 音箱',
+  'Windows 10 / 11 电脑',
+  'MacBook / Mac mini',
+  'iPhone / iPad',
+  '安卓手机 / 平板',
+  'Matter 通用家电',
+];
+
+const brandsRow2 = [
+  '智能吸顶灯 & 桌面台灯',
+  '客厅挂机 & 中央空调',
+  '自动窗帘电机',
+  '全屋多音箱同步放歌',
+  '无线开关 & 门窗感应',
+  '腾讯会议 / Zoom 联动',
+  '离家自动关灯省电',
+  '开源免费无月费',
 ];
 
 /**
- * 硬件级实时遥测带 + 双层协议总线跑马灯
- * 强化硬核科技感与核心指标记忆点
+ * 痛点对比区 + 大白话指标卡 + 支持设备品牌带
  */
 export const TelemetryBand: React.FC = () => {
   return (
-    <section className="relative z-10 border-y border-white/[0.08] bg-[#0A0A10]/85 backdrop-blur-2xl">
-      {/* 碳纤维工程斜纹纹理底层 */}
-      <div className="tech-hatch pointer-events-none absolute inset-0 opacity-75" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-400/40 to-transparent" />
-      <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        {/* 4 格精密指标仪表 */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
-          {metrics.map((item, idx) => (
+    <section
+      id="pain-points"
+      className="relative z-10 scroll-mt-20 border-y border-stone-200/80 bg-[#F4F1EA]/75 py-16 backdrop-blur-xl sm:py-20"
+    >
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {/* 标题：讲清用前 vs 用后 */}
+        <div className="mb-10 max-w-2xl">
+          <span className="inline-block rounded-full bg-white px-3 py-1 text-xs font-semibold text-indigo-700 shadow-sm ring-1 ring-stone-200">
+            为什么需要 AuraHub
+          </span>
+          <h2 className="mt-3 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">
+            以前用智能家居有多割裂，现在就有多顺手
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-stone-600 sm:text-base">
+            不用买昂贵的统一品牌全家桶，保留家里现有的灯、空调和音箱就行。
+          </p>
+        </div>
+
+        {/* 3 组真实生活对比卡片 */}
+        <div className="grid gap-5 md:grid-cols-3">
+          {painComparisons.map((item, idx) => (
             <motion.div
-              key={item.label}
+              key={item.title}
               initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.45, delay: idx * 0.06 }}
-              className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0E0E15]/85 p-4 transition-colors hover:border-indigo-400/35 hover:bg-[#12121B]"
+              className="flex flex-col justify-between rounded-3xl border border-stone-200/85 bg-white p-6 shadow-[0_6px_24px_rgba(28,25,23,0.04)]"
             >
-              {/* 卡片内背景微型科技波形线 */}
-              <svg
-                viewBox="0 0 120 40"
-                className="pointer-events-none absolute bottom-1 right-1 h-12 w-24 opacity-20 transition-opacity group-hover:opacity-45"
-              >
-                <path
-                  d={
-                    idx % 2 === 0
-                      ? 'M 0 32 Q 25 10, 45 26 T 90 14 T 120 22'
-                      : 'M 0 26 L 24 26 L 36 10 L 48 34 L 62 18 L 120 18'
-                  }
-                  fill="none"
-                  stroke="#818CF8"
-                  strokeWidth="1.5"
-                />
-              </svg>
-              {/* 边角准星装饰 */}
-              <span className="pointer-events-none absolute right-3 top-3 font-mono text-[10px] text-zinc-600 transition-colors group-hover:text-indigo-400">
-                +
-              </span>
-              <div className="flex items-center justify-between font-mono text-[11px] text-zinc-400">
-                <div className="flex items-center gap-2">
-                  {item.icon}
-                  <span>0{idx + 1}</span>
+              <div>
+                <div className="mb-3 flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-stone-100">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-base font-bold text-stone-900">
+                    {item.title}
+                  </h3>
                 </div>
-                <div className="flex h-3 items-end gap-0.5 pr-3 opacity-60">
-                  {[0, 1, 2].map((bar) => (
-                    <motion.span
-                      key={bar}
-                      className="w-0.5 rounded-full bg-indigo-400"
-                      animate={{ height: ['30%', '100%', '40%'] }}
-                      transition={{
-                        duration: 0.9 + bar * 0.2,
-                        repeat: Infinity,
-                        delay: idx * 0.15 + bar * 0.12,
-                      }}
-                    />
-                  ))}
+
+                {/* 用前痛点 */}
+                <div className="mt-4 rounded-2xl bg-stone-100/80 p-3.5 text-xs leading-relaxed text-stone-600">
+                  <div className="mb-1 flex items-center gap-1.5 font-semibold text-stone-500">
+                    <X className="h-3.5 w-3.5 text-rose-500" />
+                    <span>以前的烦恼</span>
+                  </div>
+                  {item.before}
                 </div>
-              </div>
-              <div className="mt-2.5 bg-gradient-to-b from-white via-zinc-100 to-zinc-400 bg-clip-text font-mono text-2xl font-bold tracking-tight text-transparent sm:text-3xl">
-                <ScrambleText text={item.value} durationMs={720} />
-              </div>
-              <div className="mt-1 text-xs font-medium text-zinc-200">
-                {item.label}
-              </div>
-              <div className="mt-0.5 font-mono text-[10px] text-zinc-500">
-                {item.sub}
+
+                {/* 用后体验 */}
+                <div className="mt-2.5 rounded-2xl border border-emerald-200/80 bg-emerald-50/70 p-3.5 text-xs leading-relaxed text-stone-800">
+                  <div className="mb-1 flex items-center gap-1.5 font-semibold text-emerald-700">
+                    <Check className="h-3.5 w-3.5" />
+                    <span>用了 AuraHub 后</span>
+                  </div>
+                  {item.after}
+                </div>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* 双层协议总线跑马灯 */}
-        <div className="relative mt-8 overflow-hidden rounded-xl border border-white/[0.06] bg-[#070709]/90 py-3">
-          {/* 左右渐变边缘遮罩 */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#070709] to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#070709] to-transparent" />
+        {/* 4 项通俗数字承诺 */}
+        <div className="mt-8 grid grid-cols-2 gap-3.5 lg:grid-cols-4 lg:gap-5">
+          {summaryStats.map((stat, idx) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.4, delay: idx * 0.05 }}
+              className="rounded-2xl border border-stone-200/80 bg-white/90 p-4 shadow-sm"
+            >
+              <div className="flex items-center gap-2 text-xs font-medium text-stone-500">
+                {stat.icon}
+                <span>{stat.sub}</span>
+              </div>
+              <div className="mt-2 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">
+                {stat.value}
+              </div>
+              <div className="mt-1 text-xs font-medium text-stone-600">
+                {stat.label}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* 一看就懂的兼容设备跑马灯 */}
+        <div className="relative mt-8 overflow-hidden rounded-2xl border border-stone-200/80 bg-white/85 py-3.5 shadow-sm">
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-white to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-white to-transparent" />
 
           <div className="flex w-max animate-marquee-left gap-3">
-            {[...protocolsRow1, ...protocolsRow1].map((proto, i) => (
+            {[...brandsRow1, ...brandsRow1].map((brand, i) => (
               <span
-                key={`r1-${i}`}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.025] px-3 py-1 font-mono text-[11px] text-zinc-300"
+                key={`b1-${i}`}
+                className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-[#FAF9F6] px-3.5 py-1.5 text-xs font-medium text-stone-700"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-indigo-400/80" />
-                {proto}
+                <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                {brand}
               </span>
             ))}
           </div>
 
           <div className="mt-2.5 flex w-max animate-marquee-right gap-3">
-            {[...protocolsRow2, ...protocolsRow2].map((proto, i) => (
+            {[...brandsRow2, ...brandsRow2].map((brand, i) => (
               <span
-                key={`r2-${i}`}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.015] px-3 py-1 font-mono text-[11px] text-zinc-400"
+                key={`b2-${i}`}
+                className="inline-flex items-center gap-2 rounded-full border border-stone-200/80 bg-stone-50 px-3.5 py-1.5 text-xs text-stone-600"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-sky-400/70" />
-                {proto}
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                {brand}
               </span>
             ))}
           </div>

@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Container,
+  Laptop,
   Cpu,
   Copy,
   Check,
   ArrowRight,
   CheckCircle2,
-  Server,
+  ChevronDown,
+  Terminal,
+  Sparkles,
+  Download,
+  PlugZap,
 } from 'lucide-react';
 import { SpotlightCard } from './SpotlightCard';
 
@@ -15,14 +19,16 @@ const COMPOSE_SNIPPET = `services:
   aurahub:
     image: ghcr.io/aurahub/core:latest
     container_name: aurahub
-    network_mode: host # 用于 mDNS / AirPlay / Matter 发现
+    network_mode: host # 用于局域网自动发现音箱与家电
     volumes:
       - ./data:/app/data
     restart: unless-stopped`;
 
 export const DeploymentSection: React.FC = () => {
+  const [showGeekInstall, setShowGeekInstall] = useState(false);
   const [copiedCmd, setCopiedCmd] = useState(false);
   const [copiedYaml, setCopiedYaml] = useState(false);
+  const [downloadTipOpen, setDownloadTipOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -42,7 +48,7 @@ export const DeploymentSection: React.FC = () => {
   const handleWaitlistSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !email.includes('@')) {
-      setErrorMsg('请输入有效的邮箱地址');
+      setErrorMsg('请输入正确的邮箱地址（例如 name@example.com）');
       return;
     }
     setErrorMsg('');
@@ -50,36 +56,26 @@ export const DeploymentSection: React.FC = () => {
   };
 
   return (
-    <section id="deploy" className="relative z-10 scroll-mt-20 overflow-hidden border-t border-white/[0.06] py-24 sm:py-32">
-      {/* 中央晶圆同心圆电路装饰底纹 + 双极冷光场 */}
-      <div className="tech-hatch pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]" />
-      <div className="pointer-events-none absolute left-0 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-indigo-500/[0.12] blur-[130px]" />
-      <div className="pointer-events-none absolute right-0 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-sky-400/[0.1] blur-[130px]" />
-      <svg
-        viewBox="0 0 600 600"
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[640px] w-[640px] -translate-x-1/2 -translate-y-1/2 opacity-20"
-      >
-        <circle cx="300" cy="300" r="140" fill="none" stroke="rgba(129,140,248,0.28)" strokeDasharray="4 8" />
-        <circle cx="300" cy="300" r="220" fill="none" stroke="rgba(125,211,252,0.2)" strokeDasharray="10 10" />
-        <circle cx="300" cy="300" r="290" fill="none" stroke="rgba(255,255,255,0.08)" />
-      </svg>
-
+    <section
+      id="deploy"
+      className="relative z-10 scroll-mt-20 overflow-hidden border-t border-stone-200/80 bg-[#F4F1EA]/70 py-24 sm:py-28"
+    >
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-12 max-w-2xl">
-          <div className="mb-2 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-indigo-300">
-            <Server className="h-3.5 w-3.5" />
-            <span>Dual Deployment</span>
+          <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-indigo-700 shadow-sm ring-1 ring-stone-200">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>两种使用方式任选</span>
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
-            软件开源免费，硬件极简可选
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
+            软件永久免费，也可以买小盒子插电即用
           </h2>
-          <p className="mt-3 text-sm leading-relaxed text-zinc-400 sm:text-base">
-            如果你已有 Mac mini、NAS 或软路由，一条命令即可部署；未来也可选择 ¥150 级开源 ARM 盒子插电即用。
+          <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:text-base">
+            不会写代码、没有 NAS 也没关系。直接预约一个 ¥150 左右的小盒子，像手机充电头一样插上电连 Wi-Fi 就能开始用。
           </p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* 左侧：软件开源版 */}
+          {/* 左侧：软件免费版 + 可折叠极客 Docker 专区 */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -88,83 +84,149 @@ export const DeploymentSection: React.FC = () => {
           >
             <SpotlightCard className="flex h-full flex-col justify-between p-6 sm:p-8">
               <div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.1] bg-white/[0.04] text-indigo-300">
-                      <Container className="h-4 w-4" />
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+                      <Laptop className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-zinc-100">
-                        软件开源版
+                      <h3 className="text-lg font-bold text-stone-900">
+                        方式一：装在自家电脑上（免费）
                       </h3>
-                      <span className="font-mono text-xs text-zinc-400">
-                        Mac mini / NAS / Linux Docker
+                      <span className="text-xs text-stone-500">
+                        支持 Windows · Mac · 闲置小主机 / NAS
                       </span>
                     </div>
                   </div>
-                  <span className="rounded-full border border-emerald-400/25 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-xs text-emerald-300">
+                  <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200">
                     永久免费
                   </span>
                 </div>
 
-                {/* 一键复制命令条 */}
-                <div className="mt-6 flex items-center justify-between rounded-xl border border-white/[0.12] bg-[#07070A] px-3.5 py-2.5">
-                  <code className="font-mono text-xs text-zinc-200 sm:text-sm">
-                    <span className="text-indigo-400">$ </span>docker compose up -d
-                  </code>
+                {/* 3 步大众极简使用说明 */}
+                <div className="mt-6 space-y-2.5 rounded-2xl border border-stone-200/80 bg-[#FAF9F6] p-4">
+                  <div className="text-xs font-semibold text-stone-700">
+                    三步就能把家里设备连起来：
+                  </div>
+                  {[
+                    { step: '1', text: '下载安装 AuraHub 桌面程序，打开软件' },
+                    { step: '2', text: '自动搜出家里同一个 Wi-Fi 下的音箱、灯光与空调' },
+                    { step: '3', text: '在电脑右上角或手机桌面直接遥控，设置自动规则' },
+                  ].map((item) => (
+                    <div
+                      key={item.step}
+                      className="flex items-center gap-3 rounded-xl bg-white p-2.5 text-xs text-stone-700 shadow-sm ring-1 ring-stone-100"
+                    >
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-bold text-white">
+                        {item.step}
+                      </span>
+                      <span className="font-medium">{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 桌面软件下载入口 */}
+                <div className="mt-5">
                   <button
                     type="button"
-                    onClick={handleCopyCmd}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 font-mono text-[11px] text-zinc-300 transition hover:bg-white/[0.1]"
+                    onClick={() => setDownloadTipOpen((prev) => !prev)}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-stone-800 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-50/40 hover:text-indigo-700"
                   >
-                    {copiedCmd ? (
-                      <>
-                        <Check className="h-3 w-3 text-emerald-400" />
-                        <span>已复制</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3 w-3" />
-                        <span>复制</span>
-                      </>
-                    )}
+                    <Download className="h-4 w-4" />
+                    <span>获取 Windows / Mac 桌面端（内测预览）</span>
                   </button>
+
+                  <AnimatePresence>
+                    {downloadTipOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-3 rounded-2xl border border-indigo-200 bg-indigo-50/70 p-3.5 text-xs leading-relaxed text-indigo-900">
+                          桌面一键安装包正在内测打磨中（预计 2027 Q1 开放下载）。如果你想提前尝鲜，可在右侧留下邮箱接收推送，或者展开下方的 NAS / Docker 安装方式。
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                {/* 终端风格 compose.yml 代码块 */}
-                <div className="mt-4 overflow-hidden rounded-xl border border-white/[0.09] bg-[#07070A]">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] bg-white/[0.02] px-3.5 py-2 font-mono text-[11px] text-zinc-500">
-                    <div className="flex items-center gap-2">
-                      <span className="flex gap-1">
-                        <span className="h-2 w-2 rounded-full bg-zinc-700" />
-                        <span className="h-2 w-2 rounded-full bg-zinc-700" />
-                        <span className="h-2 w-2 rounded-full bg-zinc-700" />
-                      </span>
-                      <span>docker-compose.yml</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleCopyYaml}
-                      className="text-zinc-400 transition hover:text-zinc-200"
-                    >
-                      {copiedYaml ? '已复制 YAML' : '复制配置'}
-                    </button>
-                  </div>
-                  <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-zinc-300">
-                    <code>{COMPOSE_SNIPPET}</code>
-                  </pre>
-                </div>
-              </div>
+                {/* 可折叠的极客 Docker 安装区，不打扰普通访客 */}
+                <div className="mt-5 border-t border-stone-200/80 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowGeekInstall((prev) => !prev)}
+                    className="flex w-full items-center justify-between rounded-xl px-2 py-1.5 text-xs font-medium text-stone-500 transition hover:bg-stone-100 hover:text-stone-800"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <Terminal className="h-3.5 w-3.5" />
+                      我是开发者 / NAS 用户，查看 Docker 命令安装
+                    </span>
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${
+                        showGeekInstall ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
 
-              <div className="mt-6 flex flex-wrap gap-3 font-mono text-[11px] text-zinc-400">
-                <span>• x86_64 &amp; ARM64 双架构镜像</span>
-                <span>• 内存占用 &lt; 180MB</span>
-                <span>• 开源社区驱动</span>
+                  <AnimatePresence>
+                    {showGeekInstall && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-3 space-y-3">
+                          <div className="flex items-center justify-between rounded-xl border border-stone-200 bg-stone-900 px-3.5 py-2.5 text-stone-100">
+                            <code className="font-mono text-xs">
+                              <span className="text-indigo-400">$ </span>docker compose up -d
+                            </code>
+                            <button
+                              type="button"
+                              onClick={handleCopyCmd}
+                              className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-2.5 py-1 font-mono text-[11px] text-stone-200 transition hover:bg-white/20"
+                            >
+                              {copiedCmd ? (
+                                <>
+                                  <Check className="h-3 w-3 text-emerald-400" />
+                                  <span>已复制</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="h-3 w-3" />
+                                  <span>复制</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                          <div className="overflow-hidden rounded-xl border border-stone-200 bg-stone-900 text-stone-200">
+                            <div className="flex items-center justify-between border-b border-white/10 px-3.5 py-2 font-mono text-[11px] text-stone-400">
+                              <span>docker-compose.yml</span>
+                              <button
+                                type="button"
+                                onClick={handleCopyYaml}
+                                className="text-stone-300 hover:text-white"
+                              >
+                                {copiedYaml ? '已复制配置' : '复制配置'}
+                              </button>
+                            </div>
+                            <pre className="overflow-x-auto p-3.5 font-mono text-xs leading-relaxed">
+                              <code>{COMPOSE_SNIPPET}</code>
+                            </pre>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </SpotlightCard>
           </motion.div>
 
-          {/* 右侧：轻量开源硬件盒子 (带 PCB 透视硬件示意图) */}
+          {/* 右侧：大众主推“插电即用 ¥150 硬件小盒子” */}
           <motion.div
             id="hardware-waitlist"
             className="scroll-mt-24"
@@ -175,178 +237,91 @@ export const DeploymentSection: React.FC = () => {
           >
             <SpotlightCard borderBeam className="flex h-full flex-col justify-between p-6 sm:p-8">
               <div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.1] bg-white/[0.04] text-sky-300">
-                      <Cpu className="h-4 w-4" />
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+                      <PlugZap className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-zinc-100">
-                        轻量开源硬件盒子 (AuraBox)
+                      <h3 className="text-lg font-bold text-stone-900">
+                        方式二：AuraBox 小盒子（最省心）
                       </h3>
-                      <span className="font-mono text-xs text-zinc-400">
-                        ARM64 · USB-C 5V · 插电即用
+                      <span className="text-xs text-stone-500">
+                        手机扫码连上 Wi-Fi，插电就能一直运行
                       </span>
                     </div>
                   </div>
-                  <span className="rounded-full border border-indigo-400/25 bg-indigo-500/10 px-2.5 py-0.5 font-mono text-xs text-indigo-300">
-                    ¥150 级目标
+                  <span className="shrink-0 rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white shadow-sm">
+                    约 ¥150 · 推荐
                   </span>
                 </div>
 
-                {/* 工业设计感 SVG 开源硬件透视蓝图 */}
-                <div className="mt-5 relative overflow-hidden rounded-xl border border-white/[0.08] bg-[#07070A] p-4">
-                  <div className="flex items-center justify-between font-mono text-[10px] text-zinc-500">
-                    <span>HARDWARE REV 1.2 // SCHEMATIC</span>
-                    <span className="text-indigo-300">62 × 62 × 16 mm</span>
+                {/* 消费电子外观渲染示意卡片（替代原本的 PCB 电路图） */}
+                <div className="mt-6 flex flex-col items-center justify-center rounded-2xl border border-stone-200/80 bg-gradient-to-br from-[#FAF9F6] via-white to-[#F3F4F9] p-6">
+                  {/* 极简柔和白银色 AuraBox 硬件立体小盒子示意图 */}
+                  <div className="relative flex h-24 w-48 items-center justify-center rounded-3xl border border-stone-200 bg-gradient-to-b from-white to-stone-100 shadow-[0_18px_36px_rgba(28,25,23,0.12),inset_0_2px_4px_rgba(255,255,255,0.9)]">
+                    {/* 底部投影 */}
+                    <div className="absolute -bottom-3 h-3 w-40 rounded-full bg-stone-900/10 blur-md" />
+                    {/* 正面柔和呼吸灯带 */}
+                    <div className="flex flex-col items-center gap-1.5">
+                      <span className="text-xs font-bold tracking-wide text-stone-800">
+                        AuraBox
+                      </span>
+                      <motion.div
+                        animate={{ opacity: [0.45, 1, 0.45] }}
+                        transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+                        className="h-1.5 w-12 rounded-full bg-gradient-to-r from-indigo-500 via-sky-400 to-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.6)]"
+                      />
+                    </div>
                   </div>
-                  <svg
-                    viewBox="0 0 420 120"
-                    className="mt-2 h-24 w-full"
-                    preserveAspectRatio="xMidYMid meet"
-                  >
-                    <defs>
-                      <linearGradient id="pcbGrad" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#1B1D29" />
-                        <stop offset="100%" stopColor="#0E1017" />
-                      </linearGradient>
-                    </defs>
-                    {/* 外壳 CNC 边框 */}
-                    <rect
-                      x="65"
-                      y="14"
-                      width="290"
-                      height="92"
-                      rx="14"
-                      fill="url(#pcbGrad)"
-                      stroke="rgba(255,255,255,0.16)"
-                      strokeWidth="1.2"
-                    />
-                    {/* PCB 电路走线装饰 + 通电流动脉冲光点 */}
-                    <path
-                      d="M 100 60 L 145 60 L 160 44 L 185 44"
-                      fill="none"
-                      stroke="rgba(129,140,248,0.42)"
-                      strokeWidth="1.4"
-                    />
-                    <circle r="2.2" fill="#A5B4FC">
-                      <animateMotion
-                        dur="1.6s"
-                        repeatCount="indefinite"
-                        path="M 100 60 L 145 60 L 160 44 L 185 44"
-                      />
-                    </circle>
-                    <path
-                      d="M 235 44 L 265 44 L 280 60 L 320 60"
-                      fill="none"
-                      stroke="rgba(125,211,252,0.42)"
-                      strokeWidth="1.4"
-                    />
-                    <circle r="2.2" fill="#7DD3FC">
-                      <animateMotion
-                        dur="1.6s"
-                        begin="0.4s"
-                        repeatCount="indefinite"
-                        path="M 235 44 L 265 44 L 280 60 L 320 60"
-                      />
-                    </circle>
-                    <path
-                      d="M 100 74 L 150 74 L 165 82 L 255 82"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.12)"
-                      strokeWidth="1"
-                    />
-                    {/* 左侧 USB-C 供电接口 */}
-                    <rect
-                      x="58"
-                      y="48"
-                      width="14"
-                      height="24"
-                      rx="3"
-                      fill="#27272A"
-                      stroke="rgba(255,255,255,0.22)"
-                    />
-                    <text x="20" y="63" fill="#71717A" fontSize="9" fontFamily="monospace">
-                      USB-C 5V
-                    </text>
 
-                    {/* 中央 ARM64 核心芯片 */}
-                    <rect
-                      x="185"
-                      y="32"
-                      width="50"
-                      height="50"
-                      rx="6"
-                      fill="#12131C"
-                      stroke="rgba(129,140,248,0.5)"
-                      strokeWidth="1.2"
-                    />
-                    <text x="195" y="55" fill="#E4E4E7" fontSize="8.5" fontFamily="monospace">
-                      AURA-S1
-                    </text>
-                    <text x="197" y="67" fill="#818CF8" fontSize="7" fontFamily="monospace">
-                      ARM64
-                    </text>
-
-                    {/* 右侧 Wi-Fi / Thread 蛇形天线 */}
-                    <path
-                      d="M 315 36 h 18 v 8 h -14 v 8 h 14 v 8 h -14"
-                      fill="none"
-                      stroke="rgba(125,211,252,0.5)"
-                      strokeWidth="1.4"
-                      strokeLinecap="round"
-                    />
-                    <text x="362" y="63" fill="#71717A" fontSize="9" fontFamily="monospace">
-                      Wi-Fi / BLE
-                    </text>
-
-                    {/* 呼吸指示灯 */}
-                    <circle cx="92" cy="30" r="3" fill="#818CF8" />
-                  </svg>
+                  <p className="mt-5 text-center text-xs font-medium text-stone-600">
+                    只有掌心大小 · 静音无风扇 · 用普通手机 Type-C 充电线即可供电
+                  </p>
                 </div>
 
-                {/* 硬件参数栅格 */}
+                {/* 普通人关心的三件事 */}
                 <div className="mt-4 grid grid-cols-3 gap-2.5">
-                  <div className="rounded-xl border border-white/[0.07] bg-[#08080B]/80 p-3">
-                    <div className="font-mono text-[10px] text-zinc-500">架构</div>
-                    <div className="mt-1 text-xs font-semibold text-zinc-100">
-                      ARM64 4核
+                  <div className="rounded-2xl border border-stone-200/80 bg-[#FAF9F6] p-3 text-center">
+                    <div className="text-[11px] text-stone-500">预估售价</div>
+                    <div className="mt-1 text-sm font-bold text-stone-900">
+                      约 ¥150
                     </div>
                   </div>
-                  <div className="rounded-xl border border-white/[0.07] bg-[#08080B]/80 p-3">
-                    <div className="font-mono text-[10px] text-zinc-500">供电功耗</div>
-                    <div className="mt-1 text-xs font-semibold text-zinc-100">
-                      USB-C 5V / 2.5W
+                  <div className="rounded-2xl border border-stone-200/80 bg-[#FAF9F6] p-3 text-center">
+                    <div className="text-[11px] text-stone-500">日常电费</div>
+                    <div className="mt-1 text-sm font-bold text-stone-900">
+                      一年不到 ¥10
                     </div>
                   </div>
-                  <div className="rounded-xl border border-white/[0.07] bg-[#08080B]/80 p-3">
-                    <div className="font-mono text-[10px] text-zinc-500">预装系统</div>
-                    <div className="mt-1 text-xs font-semibold text-zinc-100">
-                      Alpine Linux
+                  <div className="rounded-2xl border border-stone-200/80 bg-[#FAF9F6] p-3 text-center">
+                    <div className="text-[11px] text-stone-500">上手难度</div>
+                    <div className="mt-1 text-sm font-bold text-emerald-700">
+                      插电就会用
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* 邮箱预约 Waitlist 表单 */}
-              <div className="mt-5 rounded-xl border border-white/[0.08] bg-[#08080B]/95 p-4">
+              {/* 邮箱预约通知表单 */}
+              <div className="mt-5 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-4">
                 {submitted ? (
-                  <div className="flex items-center gap-3 py-1 text-sm text-emerald-300">
-                    <CheckCircle2 className="h-5 w-5 shrink-0" />
+                  <div className="flex items-center gap-3 py-1 text-sm text-emerald-800">
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
                     <div>
-                      <div className="font-medium">已加入 AuraBox 开源硬件预约队列</div>
-                      <div className="mt-0.5 font-mono text-xs text-zinc-400">
-                        我们将通过 {email} 通知固件进度与首批众筹动态。
+                      <div className="font-bold">已登记！首批上线时第一时间通知你</div>
+                      <div className="mt-0.5 text-xs text-stone-600">
+                        开售及桌面端内测信息将发送至 {email}
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <form onSubmit={handleWaitlistSubmit} className="space-y-2">
+                  <form onSubmit={handleWaitlistSubmit} className="space-y-2.5">
                     <label
                       htmlFor="waitlist-email"
-                      className="block font-mono text-[11px] text-zinc-400"
+                      className="block text-xs font-semibold text-stone-800"
                     >
-                      加入硬件内测与量产通知 Waitlist
+                      小盒子正在筹备量产，留个邮箱第一时间抢先体验：
                     </label>
                     <div className="flex flex-col gap-2 sm:flex-row">
                       <input
@@ -354,19 +329,20 @@ export const DeploymentSection: React.FC = () => {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="you@domain.com"
-                        className="flex-1 rounded-lg border border-white/[0.1] bg-white/[0.03] px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition focus:border-indigo-400/50 focus:bg-white/[0.05]"
+                        placeholder="输入你的常用邮箱，例如 you@qq.com"
+                        className="flex-1 rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-sm text-stone-900 placeholder-stone-400 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
                       />
                       <button
                         type="submit"
-                        className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-zinc-100 px-4 py-2 text-xs font-semibold text-zinc-950 transition hover:bg-white"
+                        className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-700"
                       >
+                        <Cpu className="h-3.5 w-3.5" />
                         <span>立即预约</span>
                         <ArrowRight className="h-3.5 w-3.5" />
                       </button>
                     </div>
                     {errorMsg && (
-                      <p className="font-mono text-xs text-rose-400">{errorMsg}</p>
+                      <p className="text-xs font-medium text-rose-600">{errorMsg}</p>
                     )}
                   </form>
                 )}
@@ -375,8 +351,8 @@ export const DeploymentSection: React.FC = () => {
           </motion.div>
         </div>
 
-        <p className="mt-6 text-center font-mono text-xs leading-relaxed text-zinc-500">
-          注：对 HomePod、小米音箱、华为音箱及各品牌智能设备的兼容，均基于开源社区协议插件及 Matter / Home Assistant 标准桥接实现，无任何官方背书或闭源逆向依赖。
+        <p className="mt-6 text-center text-xs leading-relaxed text-stone-500">
+          说明：对 HomePod、小米音箱、华为音箱等设备的兼容，均基于公开或社区开源标准协议实现，无需改装原有硬件。
         </p>
       </div>
     </section>

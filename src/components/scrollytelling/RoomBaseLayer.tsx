@@ -7,61 +7,64 @@ interface RoomBaseLayerProps {
 }
 
 /**
- * 高精度分层建筑感 2.5D 书房/桌面底座
- * 包含声学木格栅墙面、百叶透光剪影、桌面光影倒影、HomePod 编织网面、CNC 中枢视窗等细节
- * 预留 scene.layers?.baseImageUrl，可直接替换为 3D 渲染 PNG 底图
+ * 温馨居家 2.5D 书房实景底座：
+ * 随早晨、白天开会、傍晚放松、深夜晚安自动过渡墙面、原木家具与窗外光线色调
  */
 export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
   if (scene.layers?.baseImageUrl) {
     return (
       <img
         src={scene.layers.baseImageUrl}
-        alt="AuraHub Smart Room"
+        alt="AuraHub 居家书房实景"
         className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover"
       />
     );
   }
 
-  const isMeeting = scene.monitorMode === 'meeting';
+  const isDay = scene.isDaylight;
+  const isVoice = scene.id === 'voice';
   const isSleep = scene.id === 'sleep';
+  const isMeeting = scene.monitorMode === 'meeting';
+
+  // 根据时段平滑切换居家色调（清晨/白天暖白，傍晚暖暮，深夜静谧）
+  const wallTop = isDay ? '#F3EFE7' : isVoice ? '#3B3646' : '#181A24';
+  const wallBottom = isDay ? '#E4DDD1' : isVoice ? '#282431' : '#101219';
+  const slatFillA = isDay ? '#D6B894' : isVoice ? '#59463A' : '#262121';
+  const slatFillB = isDay ? '#CCA982' : isVoice ? '#4E3D32' : '#201C1C';
+  const deskTop = isDay ? '#E7D5BE' : isVoice ? '#5E4B3E' : '#252124';
+  const deskBottom = isDay ? '#D4BD9E' : isVoice ? '#46372E' : '#181619';
+  const deskEdge = isDay ? '#C5AB89' : isVoice ? '#3D3028' : '#1E1B1F';
+  const acTop = isDay ? '#FFFFFF' : isVoice ? '#D6D3D1' : '#44403C';
+  const acBottom = isDay ? '#E7E5E4' : isVoice ? '#A8A29E' : '#292524';
+  const doorBg = isDay ? '#DED7CA' : isVoice ? '#2A2633' : '#111219';
 
   return (
     <div className="pointer-events-none absolute inset-0 select-none overflow-hidden">
-      {/* 2.5D 精密建筑感书房 SVG */}
       <svg
         viewBox="0 0 1200 720"
         className="h-full w-full object-cover"
         preserveAspectRatio="xMidYMid slice"
       >
         <defs>
-          {/* 后墙深邃渐变 */}
-          <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#16161E" />
-            <stop offset="60%" stopColor="#0E0E14" />
-            <stop offset="100%" stopColor="#08080B" />
+          {/* 墙面柔和渐变 */}
+          <linearGradient id="homeWallGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={wallTop} />
+            <stop offset="100%" stopColor={wallBottom} />
           </linearGradient>
 
-          {/* 桌面碳黑岩板渐变 */}
-          <linearGradient id="deskTopGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1F1F28" />
-            <stop offset="45%" stopColor="#14141B" />
-            <stop offset="100%" stopColor="#0D0D12" />
+          {/* 橡木桌面渐变 */}
+          <linearGradient id="woodDeskGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={deskTop} />
+            <stop offset="100%" stopColor={deskBottom} />
           </linearGradient>
 
-          {/* 门框纵深走廊 */}
-          <linearGradient id="doorFrameGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#07070A" />
-            <stop offset="100%" stopColor="#13131B" />
+          {/* 空调机身渐变 */}
+          <linearGradient id="homeAcGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={acTop} />
+            <stop offset="100%" stopColor={acBottom} />
           </linearGradient>
 
-          {/* 空调磨砂机身渐变 */}
-          <linearGradient id="acBodyGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#2A2A36" />
-            <stop offset="70%" stopColor="#1B1B24" />
-            <stop offset="100%" stopColor="#14141B" />
-          </linearGradient>
-
-          {/* HomePod 菱形编织网面纹理 */}
+          {/* HomePod 编织质感 */}
           <pattern
             id="homepodMesh"
             width="8"
@@ -71,36 +74,35 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
             <path
               d="M 0 4 L 4 0 L 8 4 L 4 8 Z"
               fill="none"
-              stroke="rgba(255,255,255,0.06)"
+              stroke={isDay ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.07)'}
               strokeWidth="0.7"
             />
           </pattern>
 
-          {/* HomePod 立体渐变 */}
-          <linearGradient id="homepodGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#262632" />
-            <stop offset="35%" stopColor="#1A1A23" />
-            <stop offset="100%" stopColor="#0C0C11" />
+          <linearGradient id="homepodBodyGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor={isDay ? '#F5F5F4' : '#3F3F46'} />
+            <stop offset="45%" stopColor={isDay ? '#E7E5E4' : '#27272A'} />
+            <stop offset="100%" stopColor={isDay ? '#D6D3D1' : '#18181B'} />
           </linearGradient>
 
           {/* 显示器铝制支架 */}
           <linearGradient id="standGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#27272A" />
-            <stop offset="45%" stopColor="#71717A" />
-            <stop offset="100%" stopColor="#18181B" />
+            <stop offset="0%" stopColor="#D4D4D8" />
+            <stop offset="45%" stopColor="#FAFAFA" />
+            <stop offset="100%" stopColor="#A1A1AA" />
           </linearGradient>
 
-          {/* 屏幕桌面反射倒影 */}
+          {/* 屏幕桌面倒影 */}
           <linearGradient id="deskReflectGrad" x1="0" y1="0" x2="0" y2="1">
             <stop
               offset="0%"
               stopColor={
                 scene.monitorMode === 'meeting'
-                  ? 'rgba(129,140,248,0.22)'
+                  ? 'rgba(99,102,241,0.18)'
                   : scene.monitorMode === 'music'
-                  ? 'rgba(245,158,11,0.18)'
+                  ? 'rgba(245,158,11,0.22)'
                   : scene.monitorMode === 'standby'
-                  ? 'rgba(148,163,184,0.1)'
+                  ? 'rgba(255,255,255,0.22)'
                   : 'rgba(0,0,0,0)'
               }
             />
@@ -109,163 +111,249 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
         </defs>
 
         {/* 1. 房间背景墙 */}
-        <rect x="0" y="0" width="1200" height="720" fill="url(#wallGrad)" />
+        <rect x="0" y="0" width="1200" height="720" fill="url(#homeWallGrad)" />
 
-        {/* 左侧声学吸音木格栅阵列 (Acoustic Slats) */}
-        <g opacity="0.75">
+        {/* 左侧温馨木格栅背景墙 */}
+        <g opacity={isSleep ? 0.55 : 0.92}>
           {Array.from({ length: 14 }).map((_, i) => (
             <rect
               key={`slat-${i}`}
               x={38 + i * 13}
               y={0}
-              width="7"
+              width="7.5"
               height="465"
-              fill={i % 2 === 0 ? '#121218' : '#15151C'}
-              stroke="rgba(255,255,255,0.025)"
-              strokeWidth="0.6"
+              rx="1"
+              fill={i % 2 === 0 ? slatFillA : slatFillB}
             />
           ))}
         </g>
 
-        {/* 顶部吊顶隐形洗墙灯槽 */}
-        <rect x="220" y="0" width="840" height="10" fill="#08080C" />
+        {/* 左上角窗户百叶暖阳投影（白天或清晨可见） */}
+        {isDay && (
+          <g opacity="0.28">
+            <polygon points="240,0 430,0 590,460 320,460" fill="#FFFBEB" />
+            <line x1="250" y1="90" x2="465" y2="90" stroke="#E6DDD0" strokeWidth="5" />
+            <line x1="275" y1="180" x2="495" y2="180" stroke="#E6DDD0" strokeWidth="5" />
+            <line x1="300" y1="270" x2="525" y2="270" stroke="#E6DDD0" strokeWidth="5" />
+          </g>
+        )}
+
+        {/* 墙面踢脚线与空间分隔 */}
         <line
-          x1="230"
-          y1="10"
-          x2="1050"
-          y2="10"
-          stroke={isSleep ? 'rgba(255,255,255,0.03)' : 'rgba(148,163,184,0.22)'}
+          x1="0"
+          y1="456"
+          x2="1060"
+          y2="456"
+          stroke={isDay ? 'rgba(120,113,108,0.16)' : 'rgba(255,255,255,0.08)'}
           strokeWidth="1.5"
         />
 
-        {/* 墙面建筑护墙板与纵深分隔线 */}
-        <line x1="0" y1="455" x2="1060" y2="455" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
-        <line x1="225" y1="0" x2="225" y2="465" stroke="rgba(255,255,255,0.045)" strokeWidth="1" />
-        <line x1="885" y1="0" x2="885" y2="465" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+        {/* 右侧客厅房门与门框 */}
+        <rect x="1060" y="38" width="140" height="530" fill={doorBg} />
+        <rect
+          x="1084"
+          y="62"
+          width="116"
+          height="495"
+          fill={isDay ? '#CFC7B8' : isVoice ? '#1E1B26' : '#0B0C11'}
+          stroke={isDay ? 'rgba(120,113,108,0.2)' : 'rgba(255,255,255,0.07)'}
+        />
+        <rect
+          x="1096"
+          y="315"
+          width="20"
+          height="5"
+          rx="2.5"
+          fill={isDay ? '#78716C' : '#52525B'}
+        />
 
-        {/* 右侧门框透视结构与门缝 */}
-        <rect x="1060" y="38" width="140" height="530" fill="url(#doorFrameGrad)" />
-        <line x1="1060" y1="38" x2="1060" y2="568" stroke="rgba(255,255,255,0.09)" strokeWidth="1.5" />
-        <line x1="1060" y1="38" x2="1200" y2="38" stroke="rgba(255,255,255,0.07)" strokeWidth="1.5" />
-        {/* 门内纵深边框与极简把手 */}
-        <rect x="1085" y="64" width="115" height="495" fill="#0B0B10" stroke="rgba(255,255,255,0.04)" />
-        <rect x="1096" y="315" width="18" height="4" rx="2" fill="#3F3F46" />
+        {/* 装饰壁画框（增强居家感） */}
+        <g transform="translate(260, 95)" opacity={isSleep ? 0.4 : 0.95}>
+          <rect
+            x="0"
+            y="0"
+            width="86"
+            height="112"
+            rx="4"
+            fill={isDay ? '#FAF9F6' : '#2E2A38'}
+            stroke={isDay ? '#B89774' : '#4B4453'}
+            strokeWidth="4"
+          />
+          <circle cx="43" cy="48" r="20" fill={isDay ? '#FDE68A' : '#92400E'} opacity="0.85" />
+          <path d="M 14 92 Q 43 60 72 92 Z" fill={isDay ? '#A5B4FC' : '#4338CA'} opacity="0.6" />
+        </g>
 
-        {/* 2. 墙面极简挂机空调 */}
+        {/* 2. 墙面雅致挂机空调 */}
         <g transform="translate(730, 88)">
-          <rect x="6" y="12" width="268" height="78" rx="12" fill="rgba(0,0,0,0.5)" />
+          <rect
+            x="4"
+            y="10"
+            width="268"
+            height="78"
+            rx="14"
+            fill={isDay ? 'rgba(28,25,23,0.1)' : 'rgba(0,0,0,0.45)'}
+          />
           <rect
             x="0"
             y="0"
             width="268"
             height="76"
-            rx="12"
-            fill="url(#acBodyGrad)"
-            stroke="rgba(255,255,255,0.14)"
+            rx="14"
+            fill="url(#homeAcGrad)"
+            stroke={isDay ? 'rgba(168,162,158,0.4)' : 'rgba(255,255,255,0.14)'}
+            strokeWidth="1.2"
+          />
+          <line
+            x1="16"
+            y1="48"
+            x2="252"
+            y2="48"
+            stroke={isDay ? 'rgba(120,113,108,0.15)' : 'rgba(255,255,255,0.08)'}
             strokeWidth="1"
           />
-          {/* 面板顶部高光折线 */}
-          <line x1="16" y1="12" x2="252" y2="12" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-          <line x1="12" y1="48" x2="256" y2="48" stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" />
-          {/* 底部出风口内腔 */}
-          <rect x="18" y="54" width="232" height="14" rx="4" fill="#070709" />
+          <rect
+            x="18"
+            y="54"
+            width="232"
+            height="13"
+            rx="4"
+            fill={isDay ? '#57534E' : '#09090B'}
+          />
         </g>
 
-        {/* 3. 桌面透视结构与阴影 */}
+        {/* 3. 温馨原木桌面结构 */}
         <g>
-          <rect x="105" y="525" width="955" height="195" fill="#060608" />
-          {/* 金属桌腿 */}
-          <rect x="150" y="525" width="20" height="195" fill="#121218" />
-          <rect x="985" y="525" width="20" height="195" fill="#121218" />
+          <rect
+            x="92"
+            y="525"
+            width="980"
+            height="195"
+            fill={isDay ? '#C9B9A6' : isVoice ? '#261F1C' : '#0C0B0E'}
+            opacity="0.35"
+          />
+          {/* 桌腿 */}
+          <rect
+            x="150"
+            y="525"
+            width="20"
+            height="195"
+            fill={isDay ? '#A8A29E' : '#27272A'}
+          />
+          <rect
+            x="985"
+            y="525"
+            width="20"
+            height="195"
+            fill={isDay ? '#A8A29E' : '#27272A'}
+          />
           {/* 桌面主体 */}
           <polygon
             points="92,465 1068,465 1114,526 52,526"
-            fill="url(#deskTopGrad)"
-            stroke="rgba(255,255,255,0.1)"
+            fill="url(#woodDeskGrad)"
+            stroke={isDay ? 'rgba(168,140,108,0.45)' : 'rgba(255,255,255,0.1)'}
             strokeWidth="1"
           />
-          {/* 桌面屏前倒影区域 */}
+          {/* 桌面屏前倒影 */}
           <polygon
             points="395,466 805,466 835,518 365,518"
             fill="url(#deskReflectGrad)"
           />
-          {/* 桌面桌垫 (Desk Mat) */}
+          {/* 浅灰羊毛毡桌垫 */}
           <polygon
             points="355,478 845,478 862,516 338,516"
-            fill="#0D0D12"
-            stroke="rgba(255,255,255,0.06)"
+            fill={isDay ? '#D6D3CD' : isVoice ? '#3B363C' : '#1A1A20'}
+            stroke={isDay ? 'rgba(120,113,108,0.2)' : 'rgba(255,255,255,0.08)'}
             strokeWidth="0.8"
           />
-          {/* 机械键盘与触控板剪影 */}
+          {/* 无线键盘与触控板 */}
           <polygon
             points="455,486 675,486 682,506 448,506"
-            fill="#181820"
-            stroke="rgba(255,255,255,0.1)"
+            fill={isDay ? '#FAF9F6' : '#27272A'}
+            stroke={isDay ? 'rgba(120,113,108,0.22)' : 'rgba(255,255,255,0.12)'}
             strokeWidth="0.8"
           />
-          {/* 键盘底部微弱背光 */}
-          {!isSleep && (
-            <line
-              x1="452"
-              y1="506"
-              x2="678"
-              y2="506"
-              stroke="rgba(129,140,248,0.28)"
-              strokeWidth="1.2"
-            />
-          )}
           <polygon
             points="700,487 765,487 769,506 696,506"
-            fill="#16161D"
-            stroke="rgba(255,255,255,0.08)"
+            fill={isDay ? '#F5F5F4' : '#27272A'}
+            stroke={isDay ? 'rgba(120,113,108,0.2)' : 'rgba(255,255,255,0.1)'}
             strokeWidth="0.8"
           />
-          {/* 桌沿厚度高光 */}
+          {/* 桌沿厚度 */}
           <rect
             x="52"
             y="526"
             width="1062"
-            height="10"
+            height="12"
             rx="2"
-            fill="#13131A"
-            stroke="rgba(255,255,255,0.07)"
-            strokeWidth="0.8"
+            fill={deskEdge}
           />
         </g>
 
-        {/* 4. 中央 Pro Display 风格超窄边框显示器 */}
+        {/* 4. 中央窄边框桌面显示器 */}
         <g transform="translate(385, 212)">
-          {/* 支架投影 */}
-          <ellipse cx="215" cy="272" rx="68" ry="6" fill="rgba(0,0,0,0.65)" />
-          <polygon points="178,262 252,262 264,272 166,272" fill="#27272A" />
+          <ellipse
+            cx="215"
+            cy="272"
+            rx="68"
+            ry="6"
+            fill={isDay ? 'rgba(28,25,23,0.18)' : 'rgba(0,0,0,0.6)'}
+          />
+          <polygon points="178,262 252,262 264,272 166,272" fill="#D4D4D8" />
           <rect x="206" y="198" width="18" height="66" fill="url(#standGrad)" />
-          {/* 铝合金外框 */}
+          {/* 银灰外框 */}
           <rect
             x="0"
             y="0"
             width="430"
             height="220"
-            rx="10"
-            fill="#0A0A0D"
-            stroke="rgba(255,255,255,0.2)"
-            strokeWidth="1.5"
+            rx="12"
+            fill="#1C1917"
+            stroke={isDay ? '#A8A29E' : '#3F3F46'}
+            strokeWidth="2.2"
           />
-          {/* 内层面板 */}
-          <rect x="8" y="8" width="414" height="204" rx="5" fill="#060608" />
-          {/* 顶部前置摄像头与绿色隐私指示灯 */}
-          <circle cx="215" cy="4.5" r="1.8" fill="#18181B" />
+          <rect x="8" y="8" width="414" height="204" rx="6" fill="#09090B" />
+          {/* 摄像头与开启绿灯 */}
+          <circle cx="215" cy="4.5" r="1.8" fill="#44403C" />
           {isMeeting && (
-            <circle cx="222" cy="4.5" r="1.8" fill="#34D399" />
+            <circle cx="223" cy="4.5" r="2.2" fill="#22C55E" />
           )}
         </g>
 
-        {/* 5. 左侧建筑感悬浮悬臂台灯 */}
+        {/* 5. 左侧护眼悬浮台灯 */}
         <g transform="translate(175, 224)">
-          <ellipse cx="46" cy="256" rx="36" ry="8" fill="#181820" stroke="rgba(255,255,255,0.14)" strokeWidth="1" />
-          <line x1="46" y1="252" x2="22" y2="128" stroke="#3F3F46" strokeWidth="5.5" strokeLinecap="round" />
-          <circle cx="22" cy="128" r="6" fill="#52525B" stroke="rgba(255,255,255,0.24)" strokeWidth="1" />
-          <line x1="22" y1="128" x2="110" y2="54" stroke="#52525B" strokeWidth="4.5" strokeLinecap="round" />
-          {/* 灯头 */}
+          <ellipse
+            cx="46"
+            cy="256"
+            rx="36"
+            ry="8"
+            fill={isDay ? '#E7E5E4' : '#27272A'}
+            stroke={isDay ? '#D6D3D1' : '#3F3F46'}
+            strokeWidth="1"
+          />
+          <line
+            x1="46"
+            y1="252"
+            x2="22"
+            y2="128"
+            stroke={isDay ? '#A8A29E' : '#52525B'}
+            strokeWidth="5.5"
+            strokeLinecap="round"
+          />
+          <circle
+            cx="22"
+            cy="128"
+            r="6"
+            fill={isDay ? '#D6D3D1' : '#71717A'}
+          />
+          <line
+            x1="22"
+            y1="128"
+            x2="110"
+            y2="54"
+            stroke={isDay ? '#A8A29E' : '#52525B'}
+            strokeWidth="4.5"
+            strokeLinecap="round"
+          />
           <g transform="translate(96, 46) rotate(22)">
             <rect
               x="0"
@@ -273,8 +361,8 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
               width="68"
               height="16"
               rx="8"
-              fill="#27272F"
-              stroke="rgba(255,255,255,0.18)"
+              fill={isDay ? '#F5F5F4' : '#3F3F46'}
+              stroke={isDay ? '#D6D3D1' : '#52525B'}
               strokeWidth="1"
             />
             <rect
@@ -287,70 +375,84 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
                 scene.lampBrightness > 0.05
                   ? scene.lampTone === 'warm'
                     ? '#FBBF24'
-                    : '#F8FAFC'
-                  : '#27272A'
+                    : '#FFFFFF'
+                  : '#71717A'
               }
             />
           </g>
         </g>
 
-        {/* 6. 右侧 HomePod 编织柱体 */}
+        {/* 6. 右侧 HomePod 音箱 */}
         <g transform="translate(868, 372)">
-          <ellipse cx="44" cy="112" rx="42" ry="8" fill="rgba(0,0,0,0.7)" />
+          <ellipse
+            cx="44"
+            cy="112"
+            rx="42"
+            ry="8"
+            fill={isDay ? 'rgba(28,25,23,0.16)' : 'rgba(0,0,0,0.65)'}
+          />
           <rect
             x="4"
             y="8"
             width="80"
             height="102"
             rx="28"
-            fill="url(#homepodGrad)"
-            stroke="rgba(255,255,255,0.14)"
+            fill="url(#homepodBodyGrad)"
+            stroke={isDay ? 'rgba(168,162,158,0.45)' : 'rgba(255,255,255,0.16)'}
             strokeWidth="1"
           />
-          {/* 编织网格纹理叠加 */}
           <rect x="4" y="8" width="80" height="102" rx="28" fill="url(#homepodMesh)" />
-          {/* 顶部触控玻璃凹面 */}
           <ellipse
             cx="44"
             cy="18"
             rx="28"
             ry="8"
-            fill="#0A0A0F"
-            stroke="rgba(255,255,255,0.16)"
+            fill={isDay ? '#E7E5E4' : '#18181B'}
+            stroke={isDay ? '#D6D3D1' : 'rgba(255,255,255,0.16)'}
             strokeWidth="0.8"
           />
         </g>
 
-        {/* 7. 桌面 AuraHub 开源中枢盒子 (CNC 铝金属+透明芯片视窗) */}
+        {/* 7. 桌面小盆栽装饰（增强居家生活感） */}
+        <g transform="translate(960, 425)" opacity={isSleep ? 0.5 : 1}>
+          <path d="M 8 24 L 38 24 L 34 46 L 12 46 Z" fill={isDay ? '#E7E5E4' : '#3F3F46'} />
+          <ellipse cx="18" cy="14" rx="9" ry="14" transform="rotate(-18 18 14)" fill="#4D7C0F" opacity="0.85" />
+          <ellipse cx="28" cy="15" rx="8" ry="13" transform="rotate(20 28 15)" fill="#65A30D" opacity="0.85" />
+          <ellipse cx="23" cy="10" rx="6" ry="14" fill="#84CC16" opacity="0.8" />
+        </g>
+
+        {/* 8. 桌面 AuraHub 白色圆润小盒子 */}
         <g transform="translate(272, 450)">
-          <ellipse cx="34" cy="36" rx="38" ry="6" fill="rgba(0,0,0,0.7)" />
+          <ellipse
+            cx="34"
+            cy="36"
+            rx="38"
+            ry="6"
+            fill={isDay ? 'rgba(28,25,23,0.15)' : 'rgba(0,0,0,0.65)'}
+          />
           <rect
             x="0"
             y="8"
             width="68"
             height="26"
-            rx="6"
-            fill="#1D1D26"
-            stroke="rgba(255,255,255,0.18)"
-            strokeWidth="1"
+            rx="8"
+            fill={isDay ? '#FFFFFF' : '#27272F'}
+            stroke={isDay ? '#D6D3D1' : 'rgba(255,255,255,0.2)'}
+            strokeWidth="1.2"
           />
-          {/* 顶部透明视窗框 */}
+          {/* 顶部温和指示窗 */}
           <rect
-            x="10"
-            y="11"
-            width="48"
-            height="7"
-            rx="2"
-            fill="#0A0A10"
-            stroke="rgba(129,140,248,0.28)"
-            strokeWidth="0.6"
+            x="16"
+            y="12"
+            width="36"
+            height="5"
+            rx="2.5"
+            fill={isDay ? '#EEF2FF' : '#1E1B4B'}
           />
-          {/* 侧边散热开孔 */}
-          <line x1="8" y1="27" x2="22" y2="27" stroke="rgba(255,255,255,0.14)" strokeWidth="1" />
         </g>
       </svg>
 
-      {/* 显示器屏幕 UI 内容叠加层（精准对齐中央显示器内屏） */}
+      {/* 显示器屏幕 UI 内容叠加层 */}
       <div className="pointer-events-none absolute left-1/2 top-[30.5%] h-[27.5%] w-[34.2%] -translate-x-1/2 overflow-hidden rounded-[4px]">
         <AnimatePresence mode="wait">
           {scene.monitorMode === 'standby' && (
@@ -360,13 +462,13 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
-              className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#0F172A] via-[#09090B] to-[#111827] p-3 text-center"
+              className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-amber-100 via-sky-100 to-indigo-100 p-3 text-center"
             >
-              <div className="font-mono text-xl font-semibold tracking-tight text-zinc-100 sm:text-2xl">
+              <div className="text-xl font-bold tracking-tight text-stone-800 sm:text-2xl">
                 08:30
               </div>
-              <div className="mt-1 font-mono text-[9px] text-zinc-400">
-                AuraHub Desktop · Standby
+              <div className="mt-1 text-[10px] font-medium text-stone-600">
+                早安 · 全屋设备已就绪
               </div>
             </motion.div>
           )}
@@ -378,30 +480,35 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
-              className="flex h-full w-full flex-col justify-between bg-[#0B0F1A] p-2.5"
+              className="flex h-full w-full flex-col justify-between bg-slate-900 p-2.5 text-white"
             >
               <div className="flex items-center justify-between">
-                <span className="flex items-center gap-1 font-mono text-[8px] text-emerald-400">
+                <span className="flex items-center gap-1 text-[9px] font-medium text-emerald-300">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Zoom · Camera ON
+                  视频会议中 · 摄像头已开启
                 </span>
-                <span className="rounded bg-rose-500/20 px-1 py-0.5 font-mono text-[7px] text-rose-300">
-                  LIVE
+                <span className="rounded bg-indigo-500/30 px-1.5 py-0.5 text-[8px] text-indigo-200">
+                  自动静音音箱
                 </span>
               </div>
               <div className="my-1.5 grid flex-1 grid-cols-2 gap-1.5">
-                {[0, 1, 2, 3].map((tile) => (
+                {[
+                  { bg: 'bg-indigo-400/25', dot: 'bg-indigo-300' },
+                  { bg: 'bg-sky-400/25', dot: 'bg-sky-300' },
+                  { bg: 'bg-amber-400/20', dot: 'bg-amber-300' },
+                  { bg: 'bg-emerald-400/20', dot: 'bg-emerald-300' },
+                ].map((tile, idx) => (
                   <div
-                    key={tile}
-                    className="flex items-center justify-center rounded bg-white/[0.04] ring-1 ring-white/[0.06]"
+                    key={idx}
+                    className={`flex items-center justify-center rounded-md ${tile.bg}`}
                   >
-                    <div className="h-4 w-4 rounded-full bg-indigo-400/30 ring-1 ring-indigo-300/40" />
+                    <div className={`h-4 w-4 rounded-full ${tile.dot} opacity-80`} />
                   </div>
                 ))}
               </div>
               <div className="flex justify-center gap-2">
-                <span className="h-1.5 w-6 rounded-full bg-zinc-700" />
-                <span className="h-1.5 w-6 rounded-full bg-rose-500/70" />
+                <span className="h-1.5 w-6 rounded-full bg-slate-600" />
+                <span className="h-1.5 w-6 rounded-full bg-rose-500/80" />
               </div>
             </motion.div>
           )}
@@ -413,22 +520,22 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
-              className="flex h-full w-full flex-col justify-between bg-gradient-to-br from-[#1C1410] via-[#0C0A09] to-[#11121B] p-3"
+              className="flex h-full w-full flex-col justify-between bg-gradient-to-br from-[#2C1F1D] via-[#1C1917] to-[#1E1B2E] p-3 text-white"
             >
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[8px] text-amber-300">
-                  AirPlay 2 → HomePod
+                <span className="text-[9px] font-medium text-amber-300">
+                  正在用 HomePod 播放
                 </span>
-                <span className="font-mono text-[8px] text-zinc-500">24-bit</span>
+                <span className="text-[8px] text-stone-400">无损音质</span>
               </div>
               <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 shrink-0 rounded-md bg-gradient-to-tr from-amber-500/50 to-indigo-400/40 ring-1 ring-white/20" />
+                <div className="h-8 w-8 shrink-0 rounded-lg bg-gradient-to-tr from-amber-500 to-indigo-500 shadow-sm" />
                 <div className="min-w-0">
-                  <div className="truncate text-[10px] font-medium text-zinc-100">
-                    Midnight Blue Jazz
+                  <div className="truncate text-[11px] font-semibold text-stone-100">
+                    午夜爵士轻音乐
                   </div>
-                  <div className="truncate font-mono text-[8px] text-zinc-400">
-                    Kenny Burrell · Hi-Res
+                  <div className="truncate text-[8px] text-stone-400">
+                    客厅音箱同步播放中
                   </div>
                 </div>
               </div>
@@ -436,7 +543,7 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
                 {Array.from({ length: 18 }).map((_, idx) => (
                   <motion.div
                     key={idx}
-                    className="w-full rounded-full bg-amber-300/80"
+                    className="w-full rounded-full bg-amber-300/85"
                     animate={{
                       height: ['25%', `${45 + ((idx * 19) % 55)}%`, '20%'],
                     }}
@@ -458,7 +565,7 @@ export const RoomBaseLayer: React.FC<RoomBaseLayerProps> = ({ scene }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              className="h-full w-full bg-[#040406]"
+              className="h-full w-full bg-[#09090B]"
             />
           )}
         </AnimatePresence>

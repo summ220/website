@@ -4,7 +4,7 @@ export type MonitorMode = 'standby' | 'meeting' | 'music' | 'off';
 export type HomePodMode = 'idle' | 'muted' | 'playing' | 'off';
 
 export interface SceneLayersConfig {
-  /** 可选：替换为真实 3D 渲染的房间底图 (如 /assets/room_base.png) */
+  /** 可选：替换为真实 3D 渲染的房间底图 */
   baseImageUrl?: string;
   /** 可选：替换为真实 3D 渲染的台灯独立光影图层 */
   lampLightLayerUrl?: string;
@@ -18,11 +18,13 @@ export interface SceneState {
   badge: string;
   title: string;
   description: string;
+  /** 是否属于白天明亮房间背景 */
+  isDaylight: boolean;
   /** 环境主光强度 0-1 */
   ambientOpacity: number;
   /** 台灯亮度 0-1 */
   lampBrightness: number;
-  /** 台灯色温：cool (5600K) | neutral (5000K) | warm (2700K) */
+  /** 台灯色温：cool (自然日光) | neutral (护眼白光) | warm (温馨暖黄) */
   lampTone: 'cool' | 'neutral' | 'warm';
   /** 显示器状态 */
   monitorMode: MonitorMode;
@@ -36,7 +38,7 @@ export interface SceneState {
   doorAlertOn: boolean;
   /** 中枢小盒子呼吸灯 */
   hubBreathOn: boolean;
-  /** 动态岛语音指令文本 */
+  /** 语音指令文本 */
   voiceTranscript?: string;
   voiceActionSummary?: string;
   /** 预留 3D 多图层 PNG 替换接口 */
@@ -46,13 +48,14 @@ export interface SceneState {
 export const SCENES: SceneState[] = [
   {
     id: 'wake',
-    stepLabel: '01 / 04',
-    badge: '0% - 25% · 自然唤醒',
-    title: '清晨自然光，全屋静默待命',
+    stepLabel: '场景 01',
+    badge: '早上 08:30 · 起床准备',
+    title: '清晨阳光照进书房，一切刚刚好',
     description:
-      '清晨冷白自然光漫入书房，Mac 与 Windows 处于低功耗待机，空调关闭，HomePod 静默待命，等待你的第一个桌面动作或语音指令。',
-    ambientOpacity: 0.55,
-    lampBrightness: 0.35,
+      '白天自然光照进家里，电脑安静待机，空调保持关闭，音箱和台灯都在温柔待命。你走进房间坐下，随时准备开启一天的生活与工作。',
+    isDaylight: true,
+    ambientOpacity: 0.75,
+    lampBrightness: 0.2,
     lampTone: 'cool',
     monitorMode: 'standby',
     acOn: false,
@@ -63,12 +66,13 @@ export const SCENES: SceneState[] = [
   },
   {
     id: 'meeting',
-    stepLabel: '02 / 04',
-    badge: '25% - 50% · 桌面状态联动',
-    title: '摄像头一开，全屋进入会议模式',
+    stepLabel: '场景 02',
+    badge: '上午 10:00 · 线上开会',
+    title: '电脑一开视频会，全屋自动配合你',
     description:
-      '检测到电脑开启视频会议，台灯自动提亮并切至 5000K 高显色补光光锥，HomePod 自动静音防打扰，门口氛围灯同步渗出克制的红色勿扰光晕。',
-    ambientOpacity: 0.72,
+      '检测到电脑打开了视频会议，桌面台灯立刻亮起柔和护眼补光让你气色更好，客厅的 HomePod 自动静音防打扰，房门外还会亮起提示灯告诉家人“正在开会”。',
+    isDaylight: true,
+    ambientOpacity: 0.85,
     lampBrightness: 0.92,
     lampTone: 'neutral',
     monitorMode: 'meeting',
@@ -80,13 +84,14 @@ export const SCENES: SceneState[] = [
   },
   {
     id: 'voice',
-    stepLabel: '03 / 04',
-    badge: '50% - 75% · 本地 AI 语音大脑',
-    title: '一句话，跨品牌设备协同响应',
+    stepLabel: '场景 03',
+    badge: '晚上 20:30 · 下班回家',
+    title: '随口说句话，不同牌子的家电一起动',
     description:
-      '本地 AI 离线解析模糊意图：主灯与台灯平滑降至 25% 暖琥珀光，挂机空调张开导风板送出 24°C 柔风，HomePod 亮起极光灯环并播放爵士乐。',
-    ambientOpacity: 0.38,
-    lampBrightness: 0.25,
+      '不用打开好几个 App！说一句“有点热，灯暗一点，放点爵士乐”，小米台灯自动调成温馨暖黄光，挂机空调吹出 24°C 柔风，HomePod 同步放起音乐。',
+    isDaylight: false,
+    ambientOpacity: 0.45,
+    lampBrightness: 0.45,
     lampTone: 'warm',
     monitorMode: 'music',
     acOn: true,
@@ -94,17 +99,18 @@ export const SCENES: SceneState[] = [
     homePodMode: 'playing',
     doorAlertOn: false,
     hubBreathOn: true,
-    voiceTranscript: '“有点热，调暗灯光，用 HomePod 放点爵士乐”',
-    voiceActionSummary: '灯光 25% 暖光 · 空调 24°C · AirPlay 爵士乐',
+    voiceTranscript: '“有点热，灯暗一点，用 HomePod 放点爵士乐”',
+    voiceActionSummary: '台灯调暖 · 空调开 24°C · 开始放音乐',
   },
   {
     id: 'sleep',
-    stepLabel: '04 / 04',
-    badge: '75% - 100% · 晚安 / 离座休眠',
-    title: '一键归零，极致静谧的夜间守护',
+    stepLabel: '场景 04',
+    badge: '深夜 23:30 · 准备睡觉',
+    title: '说声晚安，全屋安静熄灯进入睡眠',
     description:
-      '全屋照明、显示器与空调渐暗熄灭，仅保留桌面 AuraHub 中枢盒子一颗微弱的冷银蓝呼吸状态灯，低功耗守护局域网自动化规则。',
-    ambientOpacity: 0.08,
+      '全屋灯光、电脑屏幕和空调一起温柔熄灭帮你省电，只剩下桌面上的 AuraHub 小盒子留着一颗微弱安心的呼吸灯，静静守护一整晚。',
+    isDaylight: false,
+    ambientOpacity: 0.1,
     lampBrightness: 0,
     lampTone: 'warm',
     monitorMode: 'off',
