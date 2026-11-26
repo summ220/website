@@ -1,54 +1,34 @@
 import React from 'react';
-import { Github, BookOpen, MessageSquare, Home } from 'lucide-react';
+import { useAtmosphere } from '../context/AtmosphereContext';
 
 export const Footer: React.FC = () => {
+  const { lighting } = useAtmosphere();
+  const isDark = lighting.lightTextBlend > 0.52;
+
   return (
-    <footer className="relative z-10 border-t border-stone-200/80 bg-[#F4F1EA]/90 py-12 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl flex-col justify-between gap-8 px-4 sm:flex-row sm:items-center sm:px-6">
-        <div className="max-w-md">
-          <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-600 text-white">
-              <Home className="h-3.5 w-3.5" />
-            </div>
-            <span className="text-base font-bold tracking-tight text-stone-900">
-              AuraHub
-            </span>
-          </div>
-          <p className="mt-2.5 text-sm leading-relaxed text-stone-600">
-            让苹果、小米、华为的音箱与家电不再各自为战。软件永久开源免费，对话与隐私只留在你家里。
-          </p>
+    <footer
+      className={`border-t py-12 transition-colors duration-700 ease-architect ${
+        isDark
+          ? 'border-white/10 text-[#B8AFA3]'
+          : 'border-warmgrey-300/40 text-warmgrey-600'
+      }`}
+    >
+      <div className="mx-auto flex max-w-7xl flex-col sm:flex-row items-center justify-between gap-4 px-6 md:px-12 text-xs tracking-wider">
+        <div className="flex items-center gap-3">
+          <span
+            className={`font-serif text-base ${
+              isDark ? 'text-[#FAF8F4]' : 'text-[#23201D]'
+            }`}
+          >
+            Lumina Home
+          </span>
+          <span className="opacity-40">·</span>
+          <span>光栖之境</span>
         </div>
 
-        <div className="flex flex-col items-start gap-4 sm:items-end">
-          <div className="flex flex-wrap items-center gap-5 text-sm font-medium text-stone-600">
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 transition hover:text-indigo-700"
-            >
-              <Github className="h-4 w-4" />
-              <span>开源主页</span>
-            </a>
-            <a
-              href="#deploy"
-              className="inline-flex items-center gap-1.5 transition hover:text-indigo-700"
-            >
-              <BookOpen className="h-4 w-4" />
-              <span>使用指南</span>
-            </a>
-            <a
-              href="#sandbox"
-              className="inline-flex items-center gap-1.5 transition hover:text-indigo-700"
-            >
-              <MessageSquare className="h-4 w-4" />
-              <span>实景体验</span>
-            </a>
-          </div>
-          <div className="text-xs text-stone-500">
-            遵循 MIT / Apache-2.0 开源协议 · AuraHub 社区共建项目
-          </div>
-        </div>
+        <p className="font-light opacity-75">
+          上海 · 北京 · 深圳 · 成都 ｜ Light that knows you before you speak.
+        </p>
       </div>
     </footer>
   );
